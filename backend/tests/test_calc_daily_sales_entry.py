@@ -1,0 +1,108 @@
+"""Calculation engine - the tests that give it its worth.
+
+The worked example and the full chain are cross-checked against the BRD/SDD, which
+themselves verified against the real AUG11/AUG12 workbooks (docs/01-BRD-.../*.xlsx).
+"""
+
+from __future__ import annotations
+
+import math
+
+from svr_backend.calc.amounts import parse_amt, round4
+from svr_backend.calc.daily_sales_entry import (
+    DailySalesEntryInput,
+    GasRow,
+    NewCreditRow,
+    OilRow,
+    compute,
+)
+
+
+def test_worked_example_no_float_drift():
+    """HS 1317.52 x 105.36 = 138813.9072 - used throughout the BRD (SDD 9)."""
+    data = DailySalesEntryInput(hs=GasRow(current="1317.52", last="0", rate="105.36"))
+    result = compute(data)
+    assert result.hs.cons == 1317.52
+    assert result.hs.amount == 138813.9072
+    assert math.isclose(result.gas_total, 138813.9072, rel_tol=0, abs_tol=1e-9)
+
+
+def test_gas_blank_guard():
+    """No Current Reading -> cons/amount stay None, not a negative garbage value."""
+    data = DailySalesEntryInput(hs=GasRow(current="", last="1476461.66", rate="105.36"))
+    result = compute(data)
+    assert result.hs.cons is None
+    assert result.hs.amount is None
+    assert result.gas_total == 0.0
+
+
+def test_parse_amt_inline_expressions():
+    # SDD 11.2 - pump sales men write scratch sums in the Amount cell.
+    assert parse_amt("527+588+100=1215") == 1215.0
+    assert parse_amt("527+588+100") == 1215.0
+    assert parse_amt("") == 0.0
+    assert parse_amt(None) == 0.0
+    assert parse_amt("abc") == 0.0
+    assert parse_amt("1317.52") == 1317.52
+
+
+def test_round4_truncates_to_four_places():
+    assert round4(138813.90723456) == 138813.9072
+    assert round4(1.000149999) == 1.0001
+    assert round4(1.00019) == 1.0002  # clearly above the half - rounds up (not banker's)
+
+
+def test_oil_rows_amount_and_closing_stock():
+    data = DailySalesEntryInput(
+        oils=[
+            OilRow(label="2T/1.20 ML Total#", qty="4", rate="62", opening="20"),
+            OilRow(label="2T/2.40 ML Total#", qty="", rate="118", opening="10"),
+        ]
+    )
+    result = compute(data)
+    assert result.oils[0].amount == 248.0
+    assert result.oils[0].closing == 16.0
+    # blank qty -> closing mirrors opening, no amount
+    assert result.oils[1].amount is None
+    assert result.oils[1].closing == 10.0
+    assert result.oil_total == 248.0
+
+
+def test_full_chain_net_bal_hand_off():
+    data = DailySalesEntryInput(
+        hs=GasRow(current="1317.52", last="0", rate="105.36"),
+        ms=GasRow(current="1000", last="0", rate="117.70"),
+        oils=[OilRow(label="2T/1.20 ML Total#", qty="4", rate="62", opening="20")],
+        expenses=["500+100=600", "250"],
+        credit_card_amounts=["1000", "500"],
+        new_credits=[NewCreditRow(ltrs="10", rate="105.36")],
+        old_credit_amounts=["300"],
+        phone_pay_unsettled="200",
+        night_cash="5000",
+    )
+    result = compute(data)
+
+    gas = 138813.9072 + 117700.0
+    oil = 248.0
+    expenses = 850.0
+    new_credits = 1053.6
+    cards = 1500.0
+    net_bal = gas + oil - expenses + 200.0 + new_credits + cards + 5000.0
+
+    assert result.gas_total == round4(gas)
+    assert result.oil_total == oil
+    assert result.expenses_total == expenses
+    assert result.new_credits_total == new_credits
+    assert result.credit_cards_total == cards
+    assert result.sum_cash == round4(gas + oil)
+    assert result.net_bal_hand_off == round4(net_bal)
+    # Section 6 is excluded from today's total, reported separately.
+    assert result.sum_old_credit == 300.0
+
+
+def test_zero_row_sections_submit_clean():
+    """All repeating sections empty - must compute without error (SDD 11.2)."""
+    result = compute(DailySalesEntryInput())
+    assert result.net_bal_hand_off == 0.0
+    assert result.oil_total == 0.0
+    assert result.credit_cards_total == 0.0

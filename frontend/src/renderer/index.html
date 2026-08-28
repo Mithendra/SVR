@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR IOCL Station</title>
+    <link rel="stylesheet" href="styles/app.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <section id="login-view" class="login-card">
+        <h1>SVR Indian Oil Service Station</h1>
+        <form id="login-form">
+          <label for="login-name">Login name</label>
+          <input id="login-name" name="login-name" autocomplete="username" required />
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+          <button type="submit">Sign in</button>
+          <p id="login-error" class="error" role="alert"></p>
+        </form>
+      </section>
+
+      <section id="nav-view" class="nav" hidden>
+        <h2>Signed in as <span id="who"></span></h2>
+        <ul id="nav-links"></ul>
+        <button id="logout" class="export-btn secondary" type="button">Sign out</button>
+      </section>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

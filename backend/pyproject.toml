@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "svr-backend"
+version = "0.1.0"
+description = "SVR Indian Oil Service Station - backend (API, calculation engine, scheduler)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "apscheduler>=3.10",
+    "argon2-cffi>=23.1",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1",
+    "httpx>=0.27",
+    "ruff>=0.4",
+]
+# Installed only on the deployment target (Windows). Kept out of the default set so
+# CI lint/test on non-Windows and local dev on any OS work without it.
+win = [
+    "pywin32>=306",
+]
+
+[project.scripts]
+svr-backend = "svr_backend.cli:run_backend"
+svr-scheduler = "svr_backend.cli:run_scheduler"
+svr-migrate = "svr_backend.cli:run_migrate"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+svr_backend = ["migrations/*.sql"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test assertions read better on one line even past the width limit.
+"tests/**" = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency-injection idiom: Depends()/Header()/require() in defaults.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Header",
+    "fastapi.Query",
+    "svr_backend.core.rbac.require",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

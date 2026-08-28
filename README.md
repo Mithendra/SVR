@@ -1,1 +1,81 @@
-This zip includes System Design & Architecture plus BRD document to develop IOCL - Dealer outlet Run and Maintain Operations Effectively and Dealer outlet name is Sri Venkata Ramana Indian Oil Service Station
+# SVR Indian Oil Service Station — Daily Operations System
+
+Digitizes the paper-based daily operations of Sri Venkata Ramana Indian Oil Service
+Station, Ponnur (an IOCL dealer outlet). Desktop application: ElectronJS frontend +
+Python loopback backend + SQLite, packaged as a single Windows installer.
+
+The full requirement history and the authoritative design live in
+[`docs/`](docs/) — the 20-section System Design & Architecture Document
+(`docs/02-System-Design-Architecture/`) is the spec; see [`CLAUDE.md`](CLAUDE.md)
+for the load-bearing conventions.
+
+## Status
+
+**Foundation + the Daily Sales Entry module, built end-to-end** as the reference
+pattern for the remaining 11 modules.
+
+| Area | State |
+|---|---|
+| Backend: migrations, auth/session, RBAC, audit, calc engine, Rate Master, Daily Sales Entry API, 23:59 IST carry-forward, APScheduler | done — `ruff` clean, `pytest` green |
+| Frontend: Electron shell + Daily Sales Entry screen (ported from the branded mockup), loopback API wiring, theme/language toggles | done — `eslint` clean, Playwright green (page-mode + `_electron` smoke) |
+| Windows Services (pywin32 hosts), per-component logging | done |
+| CI (`.github/workflows/ci.yml`), installer scaffold (`installer/`) | done — installer packaging is a scaffold; PyInstaller freeze + Tesseract bundling are follow-on |
+| OCR pipeline, Excel import/export, external-statement reconciliation, 2FA, email, modules 2–12 | not started (endpoints stubbed `501` where relevant) |
+
+## Layout
+
+```
+backend/    Python — FastAPI loopback API (127.0.0.1), calc engine, RBAC, audit, SQL migrations, scheduler
+frontend/   ElectronJS — main + preload bridge, renderer screens, Playwright tests
+installer/  electron-builder + first-run.ps1 (service registration, log tree, migrations)
+skills/     Agent Skills — daily-sales-entry/
+docs/       BRD, SDD, 14 branded mockups, architecture diagrams, sample workbooks
+```
+
+## Backend — dev setup
+
+```bash
+cd backend
+py -m venv .venv
+.venv/Scripts/pip install -e ".[dev]"      # add [win] on the deployment target for pywin32
+
+.venv/Scripts/svr-migrate --seed-demo      # fresh SQLite + one user per role (password: demo1234)
+.venv/Scripts/svr-backend                   # loopback API on http://127.0.0.1:8756
+.venv/Scripts/svr-scheduler                 # 23:59 IST carry-forward + daily backup
+
+.venv/Scripts/python -m ruff check .
+.venv/Scripts/python -m pytest -q
+```
+
+Config is env-driven (`SVR_` prefix): `SVR_DB_PATH`, `SVR_API_PORT`,
+`SVR_DATA_DIR`, `SVR_LOG_DIR`, `SVR_SCHEDULER_TIMEZONE` (default `Asia/Kolkata`).
+
+Demo users: `gsales` / `mmanager` / `oowner`, all password `demo1234`.
+
+## Frontend — dev setup
+
+```bash
+cd frontend
+npm ci
+node node_modules/electron/install.js       # if npm's postinstall was blocked
+
+npm start                                    # Electron app (expects a backend on :8756; override with SVR_API_BASE)
+npm run lint
+npx playwright install chromium && npm test  # Playwright: boots a seeded backend from ../backend/.venv, runs the suite
+```
+
+> If your shell exports `ELECTRON_RUN_AS_NODE=1`, unset it before `npm start` /
+> Electron tests — it makes `electron.exe` run as plain Node.
+
+## CI
+
+`.github/workflows/ci.yml` on `windows-latest`: `backend` (ruff + pytest),
+`frontend` (eslint + Playwright), `build` (electron-builder `.exe` artifact +
+console-script smoke).
+
+## Deployment (target PC)
+
+Run the installer as Administrator. `installer/first-run.ps1` applies migrations,
+creates `C:\ProgramData\SVR-IOCL\logs\`, registers `SVR-IOCL-Backend` and
+`SVR-IOCL-Scheduler` (`Automatic`), and adds the frontend as a Startup shortcut.
+See [`installer/README.md`](installer/README.md) for what's still scaffolded.

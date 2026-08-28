@@ -1,0 +1,11 @@
+# Normalise line endings: text stays LF in the repo, binaries untouched.
+* text=auto eol=lf
+
+*.png binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.ico binary
+
+*.ps1 text eol=crlf
+*.bat text eol=crlf

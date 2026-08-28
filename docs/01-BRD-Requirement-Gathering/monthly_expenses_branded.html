@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SVR Indian Oil Service Station - Monthly Expenses</title>
+<style>
+  :root{
+    --io-blue: #0033a0;
+    --io-blue-dark: #00246e;
+    --io-red: #e31e24;
+    --io-orange: #F37022;
+    --io-accent: var(--io-orange);
+    --paper: #ffffff;
+    --ink: #1a1a1a;
+    --line: #c9d6ef;
+    --panel: #ffffff;
+  }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--paper);
+    margin: 0;
+    padding: 24px;
+    color: var(--ink);
+  }
+  .sheet {
+    max-width: 1122px;
+    margin: 0 auto;
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  @media print {
+    .last-updated-bar { display: none !important; }
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      padding: 0;
+      background: #ffffff;
+    }
+    .sheet {
+      max-width: 100%;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .add-row-btn, .lang-toggle, .doc-tag, .theme-toggle {
+      display: none;
+    }
+  }
+  .flamebar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--io-red) 0%, var(--io-blue) 100%);
+  }
+  .header {
+    background: var(--io-blue);
+    background: linear-gradient(180deg, var(--io-blue) 0%, var(--io-blue-dark) 100%);
+    color: #fff;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    gap: 16px;
+  }
+  .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.30);
+    padding: 5px;
+  }
+  .logo-flame {
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 24px solid var(--io-red);
+    border-radius: 40% 40% 50% 50%;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .header p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #d7e0f5;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .lang-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 5px 11px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .lang-toggle button.active {
+    background: #fff;
+    color: var(--io-blue-dark);
+  }
+  .theme-toggle {
+    display: flex;
+    gap: 5px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 6px;
+  }
+  .theme-toggle button {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+    padding: 0;
+  }
+  .theme-toggle button.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .doc-tag {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .body-pad {
+    padding: 20px 24px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px 16px;
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--io-blue);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 13px;
+    background: #ffffff;
+  }
+  .section-title {
+    background: var(--io-accent);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    margin-top: 18px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+  }
+  th {
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+    font-size: 11px;
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    font-size: 12px;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  td input, td select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  .total-row td {
+    font-weight: 700;
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+  }
+  .total-row input {
+    background: #eef1fa;
+    font-weight: 700;
+  }
+  .summary-box {
+    background: #ffffff;
+    border: 1px solid var(--io-blue);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 14px 16px;
+    margin-top: 18px;
+  }
+  .summary-box h3 {
+    margin: -14px -16px 14px -16px;
+    font-size: 13px;
+    background: var(--io-accent);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--line);
+    color: var(--ink);
+  }
+  .summary-row.net {
+    font-weight: 700;
+    color: var(--io-red);
+    border-bottom: none;
+    padding-top: 8px;
+    font-size: 13.5px;
+  }
+  .verify-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .add-row-btn {
+    display: block;
+    margin: 6px 0 0 auto;
+    background: #ffffff;
+    color: var(--io-blue);
+    border: 1px solid var(--io-blue);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .add-row-btn:hover {
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+    border-color: var(--io-blue-dark);
+  }
+  .export-bar {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .export-btn {
+    background: var(--io-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .export-btn:hover {
+    background: var(--io-blue-dark);
+  }
+  .export-btn.secondary {
+    background: #ffffff;
+    color: var(--io-blue);
+    border: 1px solid var(--io-blue);
+  }
+  .export-btn.secondary:hover {
+    background: #eef1fa;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="flamebar"></div>
+
+  <div class="header">
+    <div class="logo"><img src="data:image/jpeg;base64,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" alt="Indian Oil logo" style="width:100%;height:100%;object-fit:contain;border-radius:6px"></div>
+    <div>
+      <h1>SVR Indian Oil Service Station</h1>
+      <p>PONNUR &nbsp;•&nbsp; MONTHLY EXPENSES</p>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle" role="group" aria-label="Language toggle">
+        <button type="button" class="active" onclick="setLang(this,'en')">English</button>
+        <button type="button" onclick="setLang(this,'te')">తెలుగు</button>
+      </div>
+      <div class="theme-toggle" role="group" aria-label="Color theme">
+        <button type="button" onclick="setAccent(this,'red')" title="Red #e31e24" style="background:#e31e24"></button>
+        <button type="button" onclick="setAccent(this,'blue')" title="Blue #0033a0" style="background:#0033a0"></button>
+        <button type="button" class="active" onclick="setAccent(this,'orange')" title="Orange #F37022 (default)" style="background:#F37022"></button>
+      </div>
+      <div class="doc-tag">Manual Entry Mode</div>
+    </div>
+  </div>
+
+  <div class="last-updated-bar" style="background:#eef1fa;border-bottom:1px solid var(--line);padding:6px 24px;font-size:12px;color:var(--io-blue-dark);display:flex;gap:24px;flex-wrap:wrap">
+    <span>Last Updated By: <b id="last-updated-by">Not yet saved</b></span>
+    <span>Last Updated: <b id="last-updated-time">&mdash;</b></span>
+  </div>
+
+  <div class="body-pad">
+
+    <div class="meta-grid">
+      <div class="field"><label>Logged in as</label>
+        <select id="logged-in-as">
+          <option value="">— select —</option>
+          <option>SVR Owner</option>
+          <option>Manager - Mithendra</option>
+          <option>Gopi (Pump Sales Man)</option>
+          <option>Girish (Pump Sales Man)</option>
+        </select>
+      </div>
+      <div class="field"><label>Month / Year</label><input type="month"></div>
+      <div class="field"><label>Prepared By</label><input id="prepared-by" disabled placeholder="auto (Logged in as, on Save)"></div>
+      <div class="field"><label>Status</label><input type="text" placeholder="Draft / Finalized"></div>
+    </div>
+
+    <div class="section-title">1. <span class="title-text" data-en="Payroll" data-te="జీతం చెల్లింపులు">Payroll</span> <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewCategory(payrollCats, 'exp-category-payroll', 'payroll category', 'payroll-cat-status')">+ New Category</button></div>
+    <table id="tbl-payroll-exp">
+      <tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr>
+      <tbody id="body-payroll-exp">
+      <tr>
+        <td><input type="date" class="exp-date-payroll"></td>
+        <td>
+          <select class="exp-category-payroll" onchange="calcAll()">
+            <option value="salary">Bi-weekly Salary</option>
+            <option value="advance">Salary Advances</option>
+          </select>
+        </td>
+        <td><input type="text" placeholder="e.g. Gopi - 1st half"></td>
+        <td><input class="exp-amount-payroll" oninput="calcAll()"></td>
+      </tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addPayrollExpenseRow()">+ Add row</button>
+    <p id="payroll-cat-status" style="font-size:12px;color:var(--io-blue-dark);margin:4px 0 0;min-height:16px"></p>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:4px 0 0">"Salary Advances" here is understood to consolidate what Daily Sales Entry and Daily Trial Balance capture as salary advances — this Monthly Expenses view is the rollup, not a fourth independent entry point. Employee Master's own Payroll Run section (Section 2 there) computes the actual bi-weekly pay per employee; this row records that run's total for the monthly account.</p>
+
+    <div class="section-title">2. <span class="title-text" data-en="Operational Expenses" data-te="నిర్వహణ ఖర్చులు">Operational Expenses</span> <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewCategory(operationalCats, 'exp-category-ops', 'expense category', 'ops-cat-status')">+ New Category</button></div>
+    <table id="tbl-ops-exp">
+      <tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th></tr>
+      <tbody id="body-ops-exp">
+      <tr>
+        <td><input type="date" class="exp-date-ops"></td>
+        <td>
+          <select class="exp-category-ops" onchange="calcAll()">
+            <option value="powerbill">Power Bill</option>
+            <option value="unloadbeta">Unload Beta</option>
+            <option value="buyoils">Buying Indian Oils</option>
+            <option value="repairs">Repairs</option>
+            <option value="other">Other</option>
+          </select>
+        </td>
+        <td><input type="text" placeholder="e.g. TSSPDCL August"></td>
+        <td><input class="exp-amount-ops" oninput="calcAll()"></td>
+      </tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addOpsExpenseRow()">+ Add row</button>
+    <p id="ops-cat-status" style="font-size:12px;color:var(--io-blue-dark);margin:4px 0 0;min-height:16px"></p>
+    <p style="font-size:11px;color:var(--io-red);margin:4px 0 0">RENAMED (2026-08-25): "Monthly Electrical Bill" → "Power Bill", matching Daily Trial Balance's Expense category dropdown exactly — these were confirmed to be the same real-world expense, previously named differently between the two forms.</p>
+
+    <div class="section-title">3. <span class="title-text" data-en="Expense &amp; Payroll Date Range Report" data-te="ఖర్చు &amp; జీతం తేదీ పరిధి నివేదిక">Expense &amp; Payroll Date Range Report</span></div>
+    <div class="summary-box">
+      <div class="summary-row">
+        <span>From</span>
+        <span><input type="date" id="me-range-start" style="width:140px"></span>
+      </div>
+      <div class="summary-row">
+        <span>To</span>
+        <span><input type="date" id="me-range-end" style="width:140px"></span>
+      </div>
+      <div class="summary-row">
+        <span>Category</span>
+        <span><select id="me-range-category" style="width:180px"><option value="">— All Categories —</option></select></span>
+      </div>
+      <div style="text-align:right;margin:8px 0">
+        <button type="button" class="export-btn secondary" onclick="runExpenseDateRange()">Generate Report</button>
+        <button type="button" class="export-btn secondary" onclick="clearExpenseDateRange()">Clear</button>
+      </div>
+      <div class="summary-row"><span>Entries in range</span><span id="me-range-count">—</span></div>
+      <div class="summary-row"><span>Payroll (in range)</span><span id="me-range-payroll">—</span></div>
+      <div class="summary-row"><span>Operational (in range)</span><span id="me-range-ops">—</span></div>
+      <div class="summary-row net"><span>Grand Total (in range)</span><span id="me-range-grand">—</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:4px 0 0">Filters both Sections 1 and 2 by Date, inclusive of both endpoints, and optionally by Category — for pulling a specific period and/or category (e.g. "all Power Bill entries this financial year") for a company expense/payroll claim. Rows outside the filter are dimmed, not deleted; "Clear" restores full visibility.</p>
+
+    <div class="section-title">4. <span class="title-text" data-en="Monthly Summary" data-te="నెలవారీ సారాంశం">Monthly Summary</span></div>
+    <table>
+      <tr><th>Category</th><th>Total Amount</th></tr>
+      <tbody id="body-payroll-summary"></tbody>
+      <tr class="total-row"><td>Payroll Subtotal</td><td><input id="sum-payroll-subtotal" disabled placeholder="auto"></td></tr>
+      <tbody id="body-ops-summary"></tbody>
+      <tr class="total-row"><td>Operational Subtotal</td><td><input id="sum-ops-subtotal" disabled placeholder="auto"></td></tr>
+      <tr class="total-row"><td>Grand Total — This Month</td><td><input id="sum-grand" disabled placeholder="auto"></td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">Fully dynamic — built from whichever categories actually appear in Sections 1 and 2's entries, so a newly-added category (via "+ New Category") correctly gets its own summary line automatically, not just an unused dropdown option.</p>
+
+    <div class="export-bar">
+      <button type="button" class="export-btn" onclick="saveFormDemo()" style="order:-1"><i class="ti ti-device-floppy" style="margin-right:6px;font-size:14px"></i>Save</button>
+      <button type="button" class="export-btn secondary" onclick="window.print()"><i class="ti ti-printer" style="margin-right:6px;font-size:14px"></i>Print</button>
+      <button type="button" class="export-btn secondary"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Import from Excel</button>
+      <button type="button" class="export-btn"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Export to Excel</button>
+    </div>
+    <p id="save-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+
+    <div class="verify-grid">
+      <div class="field"><label>Mgr Name</label><input id="mgr-name" disabled placeholder="auto (Logged in as, on Save)"></div>
+      <div class="field"><label>Signature</label><input type="text"></div>
+      <div class="field"><label>Date</label><input type="text"></div>
+    </div>
+
+  </div>
+</div>
+<script>
+function saveFormDemo() {
+  // DEMO only, honestly limited: no backend or database exists in this static
+  // mockup, so there is nowhere real to save to. A real Save would write this
+  // form's data to the shared SQLite backend (BRD Section 4). This button
+  // demonstrates the confirmation UX, not a working save.
+  // CONFIRMED (2026-08-27): whoever is logged in when Save is pressed is who gets
+  // recorded — Prepared By/Mgr Name no longer manually typed, auto-filled here.
+  var status = document.getElementById('save-status');
+  var loggedInAs = document.getElementById('logged-in-as').value;
+  if (!loggedInAs) {
+    status.textContent = 'Select "Logged in as" above before saving — this is who gets recorded against this entry.';
+    status.style.color = 'var(--io-red)';
+    return;
+  }
+  document.getElementById('prepared-by').value = loggedInAs;
+  document.getElementById('mgr-name').value = loggedInAs;
+  var now = new Date();
+  var timeStr = now.toLocaleString();
+  document.getElementById('last-updated-by').textContent = loggedInAs;
+  document.getElementById('last-updated-time').textContent = timeStr;
+  status.textContent = 'Demo: entries would be saved to the database as of ' + timeStr + ' by ' + loggedInAs + '. Real persistence requires the backend (BRD Section 4), not implemented in this static mockup.';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function num(id) {
+  var el = document.getElementById(id);
+  if (!el) return 0;
+  var n = parseFloat(el.value);
+  return isNaN(n) ? 0 : n;
+}
+function round4(n) { return Math.round(n * 10000) / 10000; }
+function setVal(id, val) { var el = document.getElementById(id); if (el) el.value = round4(val); }
+
+var payrollCats = ['Bi-weekly Salary', 'Salary Advances'];
+var operationalCats = ['Power Bill', 'Unload Beta', 'Buying Indian Oils', 'Repairs', 'Other'];
+
+function groupByCategory(bodyId, selectCls, amountCls) {
+  var rows = document.getElementById(bodyId).children;
+  var totals = {}; // category text -> sum
+  for (var i = 0; i < rows.length; i++) {
+    var select = rows[i].querySelector('.' + selectCls);
+    var amountInput = rows[i].querySelector('.' + amountCls);
+    if (!select || !amountInput) continue;
+    var cat = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : '';
+    var amt = parseFloat(amountInput.value);
+    if (isNaN(amt)) amt = 0;
+    if (!cat) continue;
+    totals[cat] = (totals[cat] || 0) + amt;
+  }
+  return totals;
+}
+function renderSummary(tbodyId, totals, catOrder) {
+  var tbody = document.getElementById(tbodyId);
+  var html = '';
+  var seen = {};
+  catOrder.forEach(function(cat) {
+    html += '<tr><td>' + cat + '</td><td>' + round4(totals[cat] || 0) + '</td></tr>';
+    seen[cat] = true;
+  });
+  // any category actually used but not in the known order (shouldn't normally happen
+  // since new categories are added to catOrder too, but defensive)
+  Object.keys(totals).forEach(function(cat) {
+    if (!seen[cat]) html += '<tr><td>' + cat + '</td><td>' + round4(totals[cat]) + '</td></tr>';
+  });
+  tbody.innerHTML = html;
+  var sum = 0;
+  Object.keys(totals).forEach(function(cat) { sum += totals[cat]; });
+  return sum;
+}
+function calcAll() {
+  var payrollTotals = groupByCategory('body-payroll-exp', 'exp-category-payroll', 'exp-amount-payroll');
+  var payrollSum = renderSummary('body-payroll-summary', payrollTotals, payrollCats);
+  setVal('sum-payroll-subtotal', payrollSum);
+
+  var opsTotals = groupByCategory('body-ops-exp', 'exp-category-ops', 'exp-amount-ops');
+  var opsSum = renderSummary('body-ops-summary', opsTotals, operationalCats);
+  setVal('sum-ops-subtotal', opsSum);
+
+  setVal('sum-grand', payrollSum + opsSum);
+}
+function addNewCategory(catArray, selectClass, promptLabel, statusElId) {
+  var newVal = prompt('Add a new ' + promptLabel + ':');
+  if (!newVal || !newVal.trim()) return;
+  newVal = newVal.trim();
+  if (catArray.indexOf(newVal) !== -1) {
+    alert('"' + newVal + '" is already in the list.');
+    return;
+  }
+  catArray.push(newVal);
+  var selects = document.getElementsByClassName(selectClass);
+  for (var i = 0; i < selects.length; i++) {
+    var opt = document.createElement('option');
+    opt.textContent = newVal;
+    selects[i].appendChild(opt);
+  }
+  var status = document.getElementById(statusElId);
+  if (status) {
+    status.textContent = '"' + newVal + '" added — available in every row now, and will get its own Monthly Summary line once used.';
+    status.style.color = 'var(--io-blue-dark)';
+  }
+  calcAll();
+}
+function populateCategoryFilter() {
+  // Rebuilds the filter dropdown fresh from the current category lists each time,
+  // so a category added later via "+ New Category" (Section 1/2) shows up here
+  // too without needing a separate hook into that function.
+  var select = document.getElementById('me-range-category');
+  var current = select.value;
+  var allCats = payrollCats.concat(operationalCats);
+  select.innerHTML = '<option value="">— All Categories —</option>' +
+    allCats.map(function(c) { return '<option>' + c + '</option>'; }).join('');
+  select.value = current;
+}
+function runExpenseDateRange() {
+  populateCategoryFilter();
+  var start = document.getElementById('me-range-start').value;
+  var end = document.getElementById('me-range-end').value;
+  var category = document.getElementById('me-range-category').value;
+  if (!start || !end) {
+    alert('Enter both a From and To date.');
+    return;
+  }
+  if (start > end) {
+    alert('From date must be on or before To date.');
+    return;
+  }
+  var count = 0, payrollSum = 0, opsSum = 0;
+
+  document.querySelectorAll('#body-payroll-exp tr').forEach(function(r) {
+    var dateVal = r.querySelector('.exp-date-payroll').value;
+    var catSelect = r.querySelector('.exp-category-payroll');
+    // FIXED: match by visible option TEXT, not .value — the initial hardcoded
+    // rows use lowercase value attributes ("powerbill") while the category
+    // arrays and dynamically-added rows use the visible text ("Power Bill").
+    // Comparing .value broke matching for the original rows; caught by testing
+    // an actual filter run, not assumed correct from the code.
+    var catVal = catSelect && catSelect.selectedIndex >= 0 ? catSelect.options[catSelect.selectedIndex].text : '';
+    var inDateRange = dateVal && dateVal >= start && dateVal <= end;
+    var inCategory = !category || catVal === category;
+    var inRange = inDateRange && inCategory;
+    r.style.opacity = inRange ? '1' : '0.3';
+    if (inRange) {
+      count++;
+      payrollSum += parseFloat(r.querySelector('.exp-amount-payroll').value) || 0;
+    }
+  });
+  document.querySelectorAll('#body-ops-exp tr').forEach(function(r) {
+    var dateVal = r.querySelector('.exp-date-ops').value;
+    var catSelect = r.querySelector('.exp-category-ops');
+    var catVal = catSelect && catSelect.selectedIndex >= 0 ? catSelect.options[catSelect.selectedIndex].text : '';
+    var inDateRange = dateVal && dateVal >= start && dateVal <= end;
+    var inCategory = !category || catVal === category;
+    var inRange = inDateRange && inCategory;
+    r.style.opacity = inRange ? '1' : '0.3';
+    if (inRange) {
+      count++;
+      opsSum += parseFloat(r.querySelector('.exp-amount-ops').value) || 0;
+    }
+  });
+
+  document.getElementById('me-range-count').textContent = count;
+  document.getElementById('me-range-payroll').textContent = round4(payrollSum);
+  document.getElementById('me-range-ops').textContent = round4(opsSum);
+  document.getElementById('me-range-grand').textContent = round4(payrollSum + opsSum);
+}
+function clearExpenseDateRange() {
+  document.getElementById('me-range-start').value = '';
+  document.getElementById('me-range-end').value = '';
+  document.getElementById('me-range-category').value = '';
+  document.querySelectorAll('#body-payroll-exp tr, #body-ops-exp tr').forEach(function(r) { r.style.opacity = '1'; });
+  ['me-range-count', 'me-range-payroll', 'me-range-ops', 'me-range-grand'].forEach(function(id) {
+    document.getElementById(id).textContent = '—';
+  });
+}
+function buildExpenseRow(selectClass, amountClass, options, placeholder, dateClass) {
+  var tr = document.createElement('tr');
+  var optsHtml = options.map(function(o) { return '<option>' + o + '</option>'; }).join('');
+  tr.innerHTML = '<td><input type="date" class="' + dateClass + '"></td>' +
+    '<td><select class="' + selectClass + '" onchange="calcAll()">' + optsHtml + '</select></td>' +
+    '<td><input type="text" placeholder="' + placeholder + '"></td>' +
+    '<td><input class="' + amountClass + '" oninput="calcAll()"></td>';
+  return tr;
+}
+function addPayrollExpenseRow() {
+  var body = document.getElementById('body-payroll-exp');
+  body.appendChild(buildExpenseRow('exp-category-payroll', 'exp-amount-payroll', payrollCats, 'e.g. Gopi - 1st half', 'exp-date-payroll'));
+  calcAll();
+}
+function addOpsExpenseRow() {
+  var body = document.getElementById('body-ops-exp');
+  body.appendChild(buildExpenseRow('exp-category-ops', 'exp-amount-ops', operationalCats, 'e.g. TSSPDCL August', 'exp-date-ops'));
+  calcAll();
+}
+
+function setLang(btn, lang) {
+  document.querySelectorAll('.lang-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.title-text').forEach(function(el){
+    el.textContent = lang === 'te' ? el.getAttribute('data-te') : el.getAttribute('data-en');
+  });
+}
+function setAccent(btn, color) {
+  var map = { red: 'var(--io-red)', blue: 'var(--io-blue)', orange: 'var(--io-orange)' };
+  document.documentElement.style.setProperty('--io-accent', map[color]);
+  document.querySelectorAll('.theme-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+calcAll();
+</script>
+</body>
+</html>

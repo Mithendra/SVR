@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SVR Indian Oil Service Station - Payment Receipt</title>
+<style>
+  :root {
+    --io-red: #e31e24;
+    --io-blue: #0033a0;
+    --io-blue-dark: #00246e;
+    --io-orange: #F37022;
+    --io-accent: var(--io-orange);
+    --line: #d7dce3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef1f5;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .receipt {
+    width: 380px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .flamebar { height: 4px; background: linear-gradient(90deg, var(--io-red), var(--io-blue)); border-radius: 3px 3px 0 0; margin: -16px -18px 12px; }
+  .header { text-align: center; margin-bottom: 10px; }
+  .header img { width: 56px; height: 56px; object-fit: contain; margin-bottom: 4px; }
+  .header h1 { font-size: 15px; margin: 2px 0; color: var(--io-blue-dark); }
+  .header p { font-size: 10.5px; margin: 1px 0; color: #444; line-height: 1.3; }
+  .theme-toggle { text-align: center; margin: 6px 0 10px; }
+  .theme-toggle button { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #ccc; margin: 0 3px; cursor: pointer; padding: 0; }
+  .theme-toggle button.active { box-shadow: 0 0 0 2px var(--io-accent); }
+  .divider { border: none; border-top: 1px dashed var(--line); margin: 10px 0; }
+  .row { display: flex; justify-content: space-between; font-size: 12px; margin: 4px 0; }
+  .row label { color: #555; }
+  .row input { border: none; border-bottom: 1px solid var(--line); text-align: right; font-size: 12px; width: 55%; font-family: inherit; }
+  .row input:focus { outline: none; border-bottom-color: var(--io-accent); }
+  .section-label { font-size: 11px; font-weight: 700; color: var(--io-accent); text-transform: uppercase; letter-spacing: 0.4px; margin: 10px 0 4px; }
+  .fuel-block { border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; margin-bottom: 8px; }
+  .paid-by { display: flex; gap: 10px; font-size: 12px; margin: 6px 0; flex-wrap: wrap; }
+  .paid-by label { display: flex; align-items: center; gap: 4px; }
+  .total-row { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--io-blue-dark); margin: 10px 0; padding-top: 6px; border-top: 2px solid var(--io-accent); }
+  .footer { text-align: center; font-size: 10.5px; color: #666; margin-top: 12px; }
+  .footer .thanks { font-size: 12px; font-weight: 700; color: var(--io-blue-dark); margin-bottom: 4px; }
+  .print-btn-wrap { text-align: center; margin-top: 14px; }
+  .print-btn { background: var(--io-blue); color: #fff; border: none; border-radius: 4px; padding: 8px 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .print-btn:hover { background: var(--io-blue-dark); }
+  .flag-note { font-size: 10px; color: var(--io-red); margin-top: 10px; text-align: center; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .receipt { box-shadow: none; border: none; width: 100%; max-width: 320px; }
+    .theme-toggle, .print-btn-wrap, .flag-note { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="receipt" id="receiptCard">
+  <div class="flamebar"></div>
+  <div class="header">
+    <img src="data:image/jpeg;base64,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" alt="Indian Oil logo">
+    <h1>SVR Indian Oil Service Station</h1>
+    <p>14-1-108/1 G.B.C Road, Ponnur<br>Guntur Dist, Andhra Pradesh 522124</p>
+  </div>
+
+  <div class="theme-toggle">
+    <button type="button" onclick="setAccent(this,'red')" title="Red" style="background:#e31e24"></button>
+    <button type="button" onclick="setAccent(this,'blue')" title="Blue" style="background:#0033a0"></button>
+    <button type="button" class="active" onclick="setAccent(this,'orange')" title="Orange (default)" style="background:#F37022"></button>
+  </div>
+
+  <hr class="divider">
+
+  <div style="font-size:10px;color:#888;text-align:center;margin-bottom:6px">
+    Last Updated By: <b id="last-updated-by">Not yet saved</b> &nbsp;|&nbsp; <b id="last-updated-time">&mdash;</b>
+  </div>
+
+  <div class="row"><label>Receipt #</label><input id="rc-number" placeholder="e.g. SVR-000123"></div>
+  <div class="row"><label>Date</label><input id="rc-date" type="date"></div>
+  <div class="row"><label>Time</label><input id="rc-time" type="time"></div>
+  <div class="row"><label>Pump Serial#</label><input id="rc-pump" placeholder="12BC4523V-Off/11CC2012V-Rd"></div>
+  <div class="row"><label>Attendant</label><input id="rc-attendant" placeholder="Pump Sales Man name"></div>
+  <div class="row"><label>Vehicle No. <span style="font-weight:400;font-size:9.5px;color:#888">(optional)</span></label><input id="rc-vehicle" placeholder="AP 07 XX 1234 — if provided"></div>
+
+  <div class="section-label">Fuel</div>
+  <div class="fuel-block">
+    <div class="row"><label>Type</label>
+      <select id="rc-fueltype" style="border:none;border-bottom:1px solid var(--line);font-size:12px;text-align:right;width:55%">
+        <option>Diesel (HS)</option>
+        <option>Petrol (MS)</option>
+      </select>
+    </div>
+    <div class="row"><label>Liters</label><input id="rc-liters" oninput="calcAll()"></div>
+    <div class="row"><label>Rate (&#8377;/L)</label><input id="rc-rate" oninput="calcAll()" placeholder="auto (Sell Rate)"></div>
+  </div>
+
+  <div class="total-row"><span>Total Amount</span><span>&#8377;<span id="rc-total">0.00</span></span></div>
+
+  <div class="section-label">Paid By</div>
+  <div class="paid-by">
+    <label><input type="radio" name="paidby" value="cash" onclick="togglePaymentRef()" checked> Cash</label>
+    <label><input type="radio" name="paidby" value="phonepay" onclick="togglePaymentRef()"> Phone Pay</label>
+    <label><input type="radio" name="paidby" value="card" onclick="togglePaymentRef()"> Credit Card</label>
+  </div>
+  <div id="rc-ref-block" style="display:none">
+    <div class="row" id="rc-ref-row"><label id="rc-ref-label">Ref #</label><input id="rc-ref"></div>
+    <div class="row" id="rc-card-last4-row" style="display:none"><label>Card ending</label><input id="rc-card-last4" maxlength="4" placeholder="1234"></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="footer">
+    <div class="thanks">Thank You for Choosing IOCL!</div>
+    <div>This is a computer-generated receipt.</div>
+    <div>No GST applies to fuel (Diesel/Petrol) sales in India — taxed via VAT/Excise instead. Confirmed, no GST breakdown shown.</div>
+  </div>
+
+  <div class="print-btn-wrap">
+    <button type="button" class="print-btn" onclick="saveFormDemo()" style="background:var(--io-orange);margin-right:8px">Save</button>
+    <button type="button" class="print-btn" onclick="window.print()">Print Receipt</button>
+  </div>
+  <p id="save-status" style="font-size:11px;color:var(--io-blue-dark);text-align:center;margin:6px 0 0;min-height:14px"></p>
+
+  <p class="flag-note">MOCKUP — Rate should auto-pull from Rate Master Sell Rate in the real system; not wired here since this receipt is a standalone print artifact, not part of the interconnected form set. See BRD for full list of open items.</p>
+</div>
+<script>
+function saveFormDemo() {
+  // DEMO only, honestly limited: no backend or database exists in this static
+  // mockup, so there is nowhere real to save to. A real Save would write this
+  // receipt's data to the shared SQLite backend (BRD Section 4). This button
+  // demonstrates the confirmation UX, not a working save.
+  // CONFIRMED (2026-08-27): whoever saves is who gets recorded — uses the existing
+  // Attendant field rather than a separate login selector, since that field already
+  // identifies who is handling this transaction.
+  var status = document.getElementById('save-status');
+  var attendant = document.getElementById('rc-attendant').value;
+  if (!attendant) {
+    status.textContent = 'Enter Attendant name above before saving — this is who gets recorded against this receipt.';
+    status.style.color = 'var(--io-red)';
+    return;
+  }
+  var now = new Date();
+  var timeStr = now.toLocaleString();
+  document.getElementById('last-updated-by').textContent = attendant;
+  document.getElementById('last-updated-time').textContent = timeStr;
+  status.textContent = 'Demo: receipt would be saved to the database as of ' + timeStr + '. Real persistence requires the backend (BRD Section 4).';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function calcAll() {
+  var liters = parseFloat(document.getElementById('rc-liters').value) || 0;
+  var rate = parseFloat(document.getElementById('rc-rate').value) || 0;
+  var total = liters * rate;
+  document.getElementById('rc-total').textContent = total.toFixed(2);
+}
+function togglePaymentRef() {
+  var method = document.querySelector('input[name="paidby"]:checked').value;
+  var refBlock = document.getElementById('rc-ref-block');
+  var refLabel = document.getElementById('rc-ref-label');
+  var cardRow = document.getElementById('rc-card-last4-row');
+  if (method === 'cash') {
+    refBlock.style.display = 'none';
+  } else if (method === 'phonepay') {
+    refBlock.style.display = 'block';
+    refLabel.textContent = 'UPI Ref #';
+    cardRow.style.display = 'none';
+  } else if (method === 'card') {
+    refBlock.style.display = 'block';
+    refLabel.textContent = 'Auth/Txn Ref #';
+    cardRow.style.display = 'flex';
+  }
+}
+function setAccent(btn, color) {
+  var map = { red: 'var(--io-red)', blue: 'var(--io-blue)', orange: 'var(--io-orange)' };
+  document.documentElement.style.setProperty('--io-accent', map[color]);
+  document.querySelectorAll('.theme-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

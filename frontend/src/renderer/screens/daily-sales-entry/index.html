@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Daily Sales Entry</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Daily Sales Report — Data Entry</p>
+        </div>
+        <div class="header-right">
+          <div class="lang-toggle" role="group" aria-label="Language toggle">
+            <button type="button" class="active" data-lang="en">English</button>
+            <button type="button" data-lang="te">తెలుగు</button>
+          </div>
+          <div class="theme-toggle" role="group" aria-label="Colour theme">
+            <button type="button" data-accent="red" title="Red" style="background:#e31e24"></button>
+            <button type="button" data-accent="blue" title="Blue" style="background:#0033a0"></button>
+            <button type="button" class="active" data-accent="orange" title="Orange" style="background:#f37022"></button>
+          </div>
+          <div class="doc-tag">Manual Entry Mode</div>
+        </div>
+      </div>
+
+      <div class="last-updated-bar">
+        <span>Last Updated By: <b id="last-updated-by">Not yet saved</b></span>
+        <span>Last Updated: <b id="last-updated-time">&mdash;</b></span>
+      </div>
+
+      <div class="body-pad">
+        <div class="meta-grid">
+          <div class="field">
+            <label for="shift-date">Shift Date</label>
+            <input type="date" id="shift-date" />
+          </div>
+          <div class="field">
+            <label for="pump-serial">Pump Serial#</label>
+            <select id="pump-serial">
+              <option value="12BC4523V-OFF">12BC4523V-OFF</option>
+              <option value="11CC2012V-RDF">11CC2012V-RDF</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Name</label><input id="ds-name" disabled />
+          </div>
+          <div class="field">
+            <label>Mgr Name</label><input id="mgr-name" disabled />
+          </div>
+        </div>
+        <p id="carried-note" style="font-size:11px;color:var(--io-blue-dark);margin:0 0 8px"></p>
+
+        <!-- 1. Gas Sale(s) -->
+        <div class="section-title">
+          1. <span class="tt" data-en="Gas Sale(s)" data-te="గ్యాస్ అమ్మకాలు">Gas Sale(s)</span>
+        </div>
+        <table>
+          <tr>
+            <th>Pump</th><th>Current Reading</th><th>Last Shift Reading</th>
+            <th>Cons[Last-Current]</th><th>Rate</th><th>Amount</th><th>IOCL #</th>
+          </tr>
+          <tr>
+            <td>Diesel (HS)</td>
+            <td><input id="hs-current" data-calc /></td>
+            <td><input id="hs-last" disabled placeholder="auto @ 23:59 IST" /></td>
+            <td><input id="hs-cons" disabled placeholder="auto" /></td>
+            <td><input id="hs-rate" disabled placeholder="auto (Sell Rate HS)" /></td>
+            <td><input id="hs-amount" disabled placeholder="auto" /></td>
+            <td><input id="hs-ioclnum" /></td>
+          </tr>
+          <tr>
+            <td>Petrol (MS)</td>
+            <td><input id="ms-current" data-calc /></td>
+            <td><input id="ms-last" disabled placeholder="auto @ 23:59 IST" /></td>
+            <td><input id="ms-cons" disabled placeholder="auto" /></td>
+            <td><input id="ms-rate" disabled placeholder="auto (Sell Rate MS)" /></td>
+            <td><input id="ms-amount" disabled placeholder="auto" /></td>
+            <td><input id="ms-ioclnum" /></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="5">Total Amt</td>
+            <td><input id="gas-total" disabled placeholder="auto" /></td>
+            <td></td>
+          </tr>
+        </table>
+
+        <!-- 2. Oil Sale(s) -->
+        <div class="section-title">
+          2. <span class="tt" data-en="Oil Sale(s)" data-te="నూనె అమ్మకాలు">Oil Sale(s)</span>
+        </div>
+        <table>
+          <tr>
+            <th>Item</th><th>Quantity</th><th>Rate</th>
+            <th>Opening Stock</th><th>Closing Stock</th><th>Amount</th>
+          </tr>
+          <tbody id="oil-rows"><!-- filled from /prefill oil_labels --></tbody>
+          <tr class="total-row">
+            <td colspan="5">Total Amt Oil(s)</td>
+            <td><input id="oil-total" disabled placeholder="auto" /></td>
+          </tr>
+        </table>
+
+        <!-- 3. Expenses -->
+        <div class="section-title">
+          3. <span class="tt" data-en="Expenses" data-te="ఖర్చులు">Expenses</span>
+        </div>
+        <table>
+          <tr><th>Description</th><th>Amount</th></tr>
+          <tr>
+            <td>Daily Diesel(5L) &amp; Petrol(5L) + Density Testing + Beta</td>
+            <td><input id="exp1" class="exp" data-calc /></td>
+          </tr>
+          <tr><td>Any Other Expenses</td><td><input id="exp2" class="exp" data-calc /></td></tr>
+          <tr>
+            <td>Last Night Cash Hand-off Person's Name-Signature-Amount</td>
+            <td><input id="exp3" class="exp" data-calc /></td>
+          </tr>
+          <tr class="total-row"><td>Total Amt Expenses</td><td><input id="exp-total" disabled placeholder="auto" /></td></tr>
+        </table>
+
+        <!-- 4. Credit Cards Swiping(s) -->
+        <div class="section-title">
+          4. <span class="tt" data-en="Credit Cards Swiping(s)" data-te="క్రెడిట్ కార్డ్ స్వైపింగ్">Credit Cards Swiping(s)</span>
+        </div>
+        <table>
+          <tr><th>Card Holder / Terminal ID</th><th>Card Type</th><th>Rate</th><th>Txn / Receipt #</th><th>Amount</th></tr>
+          <tbody id="cc-rows"></tbody>
+          <tr class="total-row"><td colspan="4">Total Amt Credit Cards</td><td><input id="cc-total" disabled placeholder="auto" /></td></tr>
+        </table>
+        <button type="button" class="add-row-btn" data-add="cc">+ Add row</button>
+
+        <!-- 5. Today New Credit(s) -->
+        <div class="section-title">
+          5. <span class="tt" data-en="Today New Credit(s)" data-te="నేటి కొత్త క్రెడిట్లు">Today New Credit(s)</span>
+        </div>
+        <table>
+          <tr><th>Creditor Name</th><th>Type</th><th>In Ltrs</th><th>Rate</th><th>Amount</th><th>Signature</th></tr>
+          <tbody id="nc-rows"></tbody>
+          <tr class="total-row"><td colspan="5">Total Amt New Credits Today</td><td><input id="nc-total" disabled placeholder="auto" /></td></tr>
+        </table>
+        <button type="button" class="add-row-btn" data-add="nc">+ Add row</button>
+
+        <!-- 6. Old/Pending Credit Received -->
+        <div class="section-title">
+          6. <span class="tt" data-en="Old/Pending Credit Received" data-te="పాత / పెండింగ్ క్రెడిట్ రసీదు">Old/Pending Credit Received</span>
+          <span style="font-weight:400;font-size:11px">[NOT part of today's total]</span>
+        </div>
+        <table>
+          <tr><th>Customer Name</th><th>Amount</th><th>Old Credit Given Date</th><th>Signature</th></tr>
+          <tbody id="oc-rows"></tbody>
+        </table>
+        <button type="button" class="add-row-btn" data-add="oc">+ Add row</button>
+
+        <!-- 7. Summary - Cash Hand Off -->
+        <div class="summary-box">
+          <h3>7. <span class="tt" data-en="Summary - Cash Hand Off" data-te="సారాంశం — నగదు అప్పగింత">Summary - Cash Hand Off</span></h3>
+          <div class="summary-row"><span>Cash (Gas + Oils) Total Amt</span><span><input id="sum-cash" disabled /></span></div>
+          <div class="summary-row"><span>Expenses Total Amt</span><span><input id="sum-expenses" disabled /></span></div>
+          <div class="summary-row"><span>Phone Pay Settled Total Amt as of 6:30 AM</span><span><input id="pp-settled" data-calc /></span></div>
+          <div class="summary-row"><span>Phone Pay Not Settled Total Amt</span><span><input id="pp-unsettled" data-calc /></span></div>
+          <div class="summary-row"><span>New Credits Total Amt</span><span><input id="sum-newcredits" disabled /></span></div>
+          <div class="summary-row"><span>Credit Cards Swiping Total Amt</span><span><input id="sum-cc" disabled /></span></div>
+          <div class="summary-row"><span>Night Cash Hand Off Total Amt</span><span><input id="night-cash" data-calc /></span></div>
+          <div class="summary-row net">
+            <span>Net Bal Hand off (Cash - Expenses + Phone Pay Not Settled + New Credits + Card Swiping + Night Cash)</span>
+            <span><input id="sum-netbal" disabled /></span>
+          </div>
+          <div class="summary-row"><span>Total Old Credit Amt (do NOT include in today's total)</span><span><input id="sum-oldcredit" disabled /></span></div>
+        </div>
+
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="save-btn" style="order:-1">Save</button>
+          <button type="button" class="export-btn secondary" id="print-btn">Print</button>
+          <button type="button" class="export-btn secondary" data-blank="12BC4523V-OFF">Print Blank — 12BC4523V-OFF</button>
+          <button type="button" class="export-btn secondary" data-blank="11CC2012V-RDF">Print Blank — 11CC2012V-RDF</button>
+          <button type="button" class="export-btn secondary" id="scan-btn">Scan / Upload (OCR)</button>
+          <button type="button" class="export-btn secondary" id="import-btn">Import from Excel</button>
+          <button type="button" class="export-btn" id="export-btn">Export to Excel</button>
+        </div>
+        <p id="save-status" class="status-line"></p>
+        <p style="font-size:11px;color:var(--io-blue-dark);text-align:right;margin:2px 0 0">
+          Print, Print Blank, Scan/Upload, Import, and Export apply to Sections 1–7 only
+        </p>
+
+        <!-- 8. Daily Summary -->
+        <div class="section-title">
+          8. <span class="tt" data-en="Daily Summary" data-te="రోజువారీ సారాంశం">Daily Summary</span>
+        </div>
+        <table>
+          <tr><th>Item</th><th>Total</th></tr>
+          <tr><td>Total HS</td><td><input id="ds-hs" disabled /></td></tr>
+          <tr><td>Total MS</td><td><input id="ds-ms" disabled /></td></tr>
+          <tbody id="ds-oil-rows"></tbody>
+        </table>
+
+        <div class="verify-grid">
+          <div class="field"><label>Verified By</label><input id="verify-name" disabled /></div>
+          <div class="field"><label>Signature</label><input type="text" /></div>
+          <div class="field"><label>Date</label><input type="text" /></div>
+        </div>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SVR Indian Oil Service Station - Daily Trial Balance</title>
+<style>
+  :root{
+    --io-blue: #0033a0;
+    --io-blue-dark: #00246e;
+    --io-red: #e31e24;
+    --io-orange: #F37022;
+    --io-accent: var(--io-orange);
+    --paper: #ffffff;
+    --ink: #1a1a1a;
+    --line: #c9d6ef;
+    --panel: #ffffff;
+  }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--paper);
+    margin: 0;
+    padding: 24px;
+    color: var(--ink);
+  }
+  .sheet {
+    max-width: 1122px;
+    margin: 0 auto;
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  @media print {
+    .last-updated-bar { display: none !important; }
+    @page {
+      size: A4 landscape;
+      margin: 10mm;
+    }
+    body {
+      padding: 0;
+      background: #ffffff;
+    }
+    .sheet {
+      max-width: 100%;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .add-row-btn, .lang-toggle, .doc-tag, .theme-toggle {
+      display: none;
+    }
+  }
+  .flamebar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--io-red) 0%, var(--io-blue) 100%);
+  }
+  .header {
+    background: var(--io-blue);
+    background: linear-gradient(180deg, var(--io-blue) 0%, var(--io-blue-dark) 100%);
+    color: #fff;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    gap: 16px;
+  }
+  .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.30);
+    padding: 5px;
+  }
+  .logo-flame {
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 24px solid var(--io-red);
+    border-radius: 40% 40% 50% 50%;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .header p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #d7e0f5;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .lang-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 5px 11px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .lang-toggle button.active {
+    background: #fff;
+    color: var(--io-blue-dark);
+  }
+  .theme-toggle {
+    display: flex;
+    gap: 5px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 6px;
+  }
+  .theme-toggle button {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+    padding: 0;
+  }
+  .theme-toggle button.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .doc-tag {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .body-pad {
+    padding: 20px 24px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px 16px;
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--io-blue);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 13px;
+    background: #ffffff;
+  }
+  .section-title {
+    background: var(--io-accent);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    margin-top: 18px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+  }
+  th {
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+    font-size: 11px;
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    font-size: 12px;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  td input, td select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  .total-row td {
+    font-weight: 700;
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+  }
+  .total-row input {
+    background: #eef1fa;
+    font-weight: 700;
+  }
+  .summary-box {
+    background: #ffffff;
+    border: 1px solid var(--io-blue);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 14px 16px;
+    margin-top: 18px;
+  }
+  .summary-box h3 {
+    margin: -14px -16px 14px -16px;
+    font-size: 13px;
+    background: var(--io-accent);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--line);
+    color: var(--ink);
+  }
+  .summary-row.net {
+    font-weight: 700;
+    color: var(--io-red);
+    border-bottom: none;
+    padding-top: 8px;
+    font-size: 13.5px;
+  }
+  .verify-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .add-row-btn {
+    display: block;
+    margin: 6px 0 0 auto;
+    background: #ffffff;
+    color: var(--io-blue);
+    border: 1px solid var(--io-blue);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .add-row-btn:hover {
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+    border-color: var(--io-blue-dark);
+  }
+  .export-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .export-btn {
+    background: var(--io-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .export-btn:hover {
+    background: var(--io-blue-dark);
+  }
+  .export-btn.secondary {
+    background: #ffffff;
+    color: var(--io-blue);
+    border: 1px solid var(--io-blue);
+  }
+  .export-btn.secondary:hover {
+    background: #eef1fa;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="flamebar"></div>
+
+  <div class="header">
+    <div class="logo"><img src="data:image/jpeg;base64,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" alt="Indian Oil logo" style="width:100%;height:100%;object-fit:contain;border-radius:6px"></div>
+    <div>
+      <h1>SVR Indian Oil Service Station</h1>
+      <p>PONNUR &nbsp;•&nbsp; DAILY TRIAL BALANCE</p>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle" role="group" aria-label="Language toggle">
+        <button type="button" class="active" onclick="setLang(this,'en')">English</button>
+        <button type="button" onclick="setLang(this,'te')">తెలుగు</button>
+      </div>
+      <div class="theme-toggle" role="group" aria-label="Color theme">
+        <button type="button" onclick="setAccent(this,'red')" title="Red #e31e24" style="background:#e31e24"></button>
+        <button type="button" onclick="setAccent(this,'blue')" title="Blue #0033a0" style="background:#0033a0"></button>
+        <button type="button" class="active" onclick="setAccent(this,'orange')" title="Orange #F37022 (default)" style="background:#F37022"></button>
+      </div>
+      <div class="doc-tag">Manual Entry Mode</div>
+    </div>
+  </div>
+
+  <div class="last-updated-bar" style="background:#eef1fa;border-bottom:1px solid var(--line);padding:6px 24px;font-size:12px;color:var(--io-blue-dark);display:flex;gap:24px;flex-wrap:wrap">
+    <span>Last Updated By: <b id="last-updated-by">Not yet saved</b></span>
+    <span>Last Updated: <b id="last-updated-time">&mdash;</b></span>
+  </div>
+
+  <div class="body-pad">
+
+    <div class="meta-grid">
+      <div class="field"><label>Logged in as</label>
+        <select id="logged-in-as">
+          <option value="">— select —</option>
+          <option>SVR Owner</option>
+          <option>Manager - Mithendra</option>
+          <option>Gopi (Pump Sales Man)</option>
+          <option>Girish (Pump Sales Man)</option>
+        </select>
+      </div>
+      <div class="field"><label>Date</label><input type="text" placeholder="DD-MM-YYYY"></div>
+      <div class="field"><label>Prepared By</label><input id="prepared-by" disabled placeholder="auto (Logged in as, on Save)"></div>
+      <div class="field"><label>Shift Data Source</label><input type="text" placeholder="Both Pump Sales Men's Daily Sales Reports"></div>
+      <div class="field"><label>Status</label><input type="text" placeholder="Draft / Finalized"></div>
+    </div>
+
+    <p style="font-size:11px;color:var(--io-red);margin:0 0 10px">RECREATED (2026-08-25) — section order, names, and formulas rebuilt to match the AUG25 source exactly. This includes a real structural change: Load/Unload Details moved from Section 2 to Section 10 (last, before Old/New Credit Sales Details), and every other section shifted number accordingly. See BRD 5.8.5 for the full change list and every open question flagged rather than guessed at.</p>
+
+    <div class="section-title">1. <span class="title-text" data-en="IOCL Stock Readings" data-te="ఐఓసిఎల్ నిల్వ రీడింగ్స్">IOCL Stock Readings</span> <span style="font-weight:400;font-size:11px">[independent regulatory reading — manual entry, NOT pulled from Section 2]</span></div>
+    <div style="overflow-x:auto;border:1px solid var(--line);border-radius:0 0 6px 6px">
+    <table style="min-width:1400px;border:none;border-radius:0">
+      <tr><th>Fuel</th><th>IOCL Last</th><th>IOCL Current</th><th>[Last-Current]</th><th>Actual Consump</th><th>Consump Diff</th><th>Daily Testing</th><th>Margin</th><th>Margin Total</th><th>2T Sales</th><th>Total Sale Amt</th><th>IOCL Adv</th><th>IOCL Profit</th></tr>
+      <tr>
+        <td style="white-space:nowrap">1.1 Diesel (HS)</td>
+        <td><input id="s1-hs-last" disabled placeholder="auto @ 23:59 IST" title="Auto-carried nightly (Asia/Kolkata timezone) from yesterday's IOCL Current Reading."></td>
+        <td><input id="s1-hs-curr" oninput="calcAll()"></td>
+        <td><input id="s1-hs-diff" disabled placeholder="auto"></td>
+        <td><input id="s1-hs-cons" disabled placeholder="auto (from Sec 2)"></td>
+        <td><input id="s1-hs-consdiff" disabled placeholder="auto"></td>
+        <td><input id="s1-hs-testing" disabled placeholder="auto"></td>
+        <td><input id="s1-hs-margin" disabled placeholder="auto"></td>
+        <td><input id="s1-hs-margintotal" disabled placeholder="n/a"></td>
+        <td><input id="s1-hs-2tsales" disabled placeholder="n/a"></td>
+        <td><input id="s1-hs-totalsale" disabled placeholder="n/a"></td>
+        <td><input id="s1-hs-iocladv" placeholder="manual — formula unconfirmed" title="UNCONFIRMED FORMULA: could not be reliably derived from available AUG25 data. Left as manual entry rather than guessed. See BRD 5.8.5."></td>
+        <td><input id="s1-hs-ioclprofit" disabled placeholder="n/a"></td>
+      </tr>
+      <tr>
+        <td style="white-space:nowrap">1.2 Petrol (MS)</td>
+        <td><input id="s1-ms-last" disabled placeholder="auto @ 23:59 IST" title="Auto-carried nightly (Asia/Kolkata timezone) from yesterday's IOCL Current Reading."></td>
+        <td><input id="s1-ms-curr" oninput="calcAll()"></td>
+        <td><input id="s1-ms-diff" disabled placeholder="auto"></td>
+        <td><input id="s1-ms-cons" disabled placeholder="auto (from Sec 2)"></td>
+        <td><input id="s1-ms-consdiff" disabled placeholder="auto"></td>
+        <td><input id="s1-ms-testing" disabled placeholder="auto"></td>
+        <td><input id="s1-ms-margin" disabled placeholder="auto"></td>
+        <td><input id="s1-ms-margintotal" disabled placeholder="auto"></td>
+        <td><input id="s1-ms-2tsales" disabled placeholder="auto (from Sec 2.1)"></td>
+        <td><input id="s1-ms-totalsale" disabled placeholder="auto"></td>
+        <td><input id="s1-ms-iocladv" placeholder="manual — formula unconfirmed" title="UNCONFIRMED FORMULA: could not be reliably derived from available AUG25 data. Left as manual entry rather than guessed. See BRD 5.8.5."></td>
+        <td><input id="s1-ms-ioclprofit" disabled placeholder="auto"></td>
+      </tr>
+    </table>
+    </div>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">Margin Total, 2T Sales, Total Sale Amt, and IOCL Profit shown once (Petrol row) — combining both fuels, matching the AUG25 source layout exactly.</p>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:4px 0 0">CONFIRMED (2026-08-26): this section stays fully independent, manual entry only — no pull mechanism, matching the header note above. An earlier "Pull IOCL Current Reading" button contradicted this and has been removed.</p>
+
+    <div class="section-title">2. <span class="title-text" data-en="Day Sales Report" data-te="రోజువారీ అమ్మకాల నివేదిక">Day Sales Report</span> <span style="font-weight:400;font-size:11px">[pulled from Daily Sales Report]</span></div>
+    <table>
+      <tr><th>Pump &amp; Fuel</th><th>Current Reading</th><th>Last Reading</th><th>[Last-Current]</th><th>Rate</th><th>Per Pump</th></tr>
+      <tr><td style="white-space:nowrap">2.1 12BC4523V-Off - Diesel (HS-Nz-1)</td><td><input id="s2-office-hs-today" disabled></td><td><input id="s2-office-hs-last" disabled placeholder="auto @ 23:59 IST"></td><td><input id="s2-office-hs-cons" disabled placeholder="auto"></td><td><input id="s2-office-hs-rate" disabled value="105.36" title="Default Sell Rate HS, locked. Only changes via Rate Master's Supervisor/Owner-only Push Rate Update."></td><td><input id="s2-office-hs-amt" disabled placeholder="auto"></td></tr>
+      <tr><td style="white-space:nowrap">2.2 12BC4523V-Off - Petrol (MS-Nz-2)</td><td><input id="s2-office-ms-today" disabled></td><td><input id="s2-office-ms-last" disabled placeholder="auto @ 23:59 IST"></td><td><input id="s2-office-ms-cons" disabled placeholder="auto"></td><td><input id="s2-office-ms-rate" disabled value="117.7" title="Default Sell Rate MS, locked. Only changes via Rate Master's Supervisor/Owner-only Push Rate Update."></td><td><input id="s2-office-ms-amt" disabled placeholder="auto"></td></tr>
+      <tr><td style="white-space:nowrap">2.3 11CC2012V-Road - Diesel (HS-Nz-1)</td><td><input id="s2-road-hs-today" disabled></td><td><input id="s2-road-hs-last" disabled placeholder="auto @ 23:59 IST"></td><td><input id="s2-road-hs-cons" disabled placeholder="auto"></td><td><input id="s2-road-hs-rate" disabled value="105.36" title="Default Sell Rate HS, locked. Only changes via Rate Master's Supervisor/Owner-only Push Rate Update."></td><td><input id="s2-road-hs-amt" disabled placeholder="auto"></td></tr>
+      <tr><td style="white-space:nowrap">2.4 11CC2012V-Road - Petrol (MS-Nz-2)</td><td><input id="s2-road-ms-today" disabled></td><td><input id="s2-road-ms-last" disabled placeholder="auto @ 23:59 IST"></td><td><input id="s2-road-ms-cons" disabled placeholder="auto"></td><td><input id="s2-road-ms-rate" disabled value="117.7" title="Default Sell Rate MS, locked. Only changes via Rate Master's Supervisor/Owner-only Push Rate Update."></td><td><input id="s2-road-ms-amt" disabled placeholder="auto"></td></tr>
+      <tr class="total-row"><td colspan="5">2.5 Total Sale Ltrs.</td><td><input id="s2-total-ltrs" disabled placeholder="auto"></td></tr>
+    </table>
+    <table style="margin-top:8px">
+      <tr><th>2.6 Oil Sales</th><th>Sold</th><th>Rate</th><th>Opening Stock</th><th>Closing Stock</th><th>Amount</th></tr>
+      <tr><td>2.6.1 2T/1.20 ML</td><td><input id="s2-oil1-qty" oninput="calcAll()"></td><td><input id="s2-oil1-rate" oninput="calcAll()"></td><td><input id="s2-oil1-open" disabled placeholder="auto (Inventory)"></td><td><input id="s2-oil1-close" disabled placeholder="auto"></td><td><input id="s2-oil1-amt" disabled placeholder="auto"></td></tr>
+      <tr><td>2.6.2 2T/1.50 ML</td><td><input id="s2-oil2-qty" oninput="calcAll()"></td><td><input id="s2-oil2-rate" oninput="calcAll()"></td><td><input id="s2-oil2-open" disabled placeholder="auto (Inventory)"></td><td><input id="s2-oil2-close" disabled placeholder="auto"></td><td><input id="s2-oil2-amt" disabled placeholder="auto"></td></tr>
+      <tr><td>2.6.3 Battery Water Total 1 Lts</td><td><input id="s2-oil3-qty" oninput="calcAll()"></td><td><input id="s2-oil3-rate" oninput="calcAll()"></td><td><input id="s2-oil3-open" disabled placeholder="auto (Inventory)"></td><td><input id="s2-oil3-close" disabled placeholder="auto"></td><td><input id="s2-oil3-amt" disabled placeholder="auto"></td></tr>
+      <tr><td>2.6.4 20/40 Engine Total in 1/2Ltr</td><td><input id="s2-oil4-qty" oninput="calcAll()"></td><td><input id="s2-oil4-rate" oninput="calcAll()"></td><td><input id="s2-oil4-open" disabled placeholder="auto (Inventory)"></td><td><input id="s2-oil4-close" disabled placeholder="auto"></td><td><input id="s2-oil4-amt" disabled placeholder="auto"></td></tr>
+      <tr><td>2.6.5 20/40 Engine Total in 1Ltr</td><td><input id="s2-oil5-qty" oninput="calcAll()"></td><td><input id="s2-oil5-rate" oninput="calcAll()"></td><td><input id="s2-oil5-open" disabled placeholder="auto (Inventory)"></td><td><input id="s2-oil5-close" disabled placeholder="auto"></td><td><input id="s2-oil5-amt" disabled placeholder="auto"></td></tr>
+      <tbody id="body-oil-extra"></tbody>
+      <tr class="total-row"><td colspan="5">2.6.6 Oil Sale(s): Total Amount</td><td><input id="s2-oil-subtotal" disabled placeholder="auto"></td></tr>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addOilItemRow()">+ Add Oil Item</button>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:4px 0 0">New items added here have Rate/Opening Stock entered manually (not yet linked to Rate Master/Inventory Tracking, which only know the 5 named items above) — included automatically in 2.6.6, and in "2T Sales"/Total Sale Amt in Section 1 above.</p>
+    <table style="margin-top:8px">
+      <tr class="total-row"><td>2.7 Daily Sales Total Amt</td><td><input id="s2-daily-total" disabled placeholder="auto"></td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">CORRECTED (2026-08-25, later same day): full 5-column Oil Sales structure restored to match AUG25 exactly (Sold/Rate/Opening Stock/Closing Stock/Amount) — a prior rebuild had incorrectly kept this simplified to Item+Amount only. Opening/Closing Stock auto-sync with Inventory Tracking (Opening = that module's current Closing Stock; Closing = Opening − Sold, feeding back as the new Closing Stock) — same confirmed pattern already used on Daily Sales Entry's own Oil Sale(s) section.</p>
+
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">2.1's 5 oil rows auto-pull from Daily Sales Entry's Section 8 (Daily Summary), summed across both pump sales men. "Sold"/"Rate"/"Opening Stock"/"Closing Stock" from the AUG25 source live on Daily Sales Entry itself (Section 5.4.1) — this Trial Balance view keeps just Item + Total Amount, consistent with the 2026-08-16 decision.</p>
+    <div style="text-align:right;margin-top:8px">
+      <button type="button" class="export-btn secondary" onclick="updateFromDailySalesDemo()">Update from Daily Sales Summary</button>
+    </div>
+    <p id="ds-sync-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+
+    <div class="section-title">3. <span class="title-text" data-en="Daily Cash &amp; Bank Balances" data-te="రోజువారీ నగదు &amp; బ్యాంక్ నిల్వలు">Daily Cash &amp; Bank Balances</span> <span style="font-weight:400;font-size:11px">[IOCL Spana / Indian Bank / Yes Bank / Other Ongoing / New Credits]</span></div>
+    <table>
+      <tr><td>3.1 On Hand Old Cash</td><td><input id="s3-onhand" oninput="calcAll()"></td></tr>
+      <tr><td>3.2 Night Cash Hand off</td><td><input id="s3-night" oninput="calcAll()"></td></tr>
+      <tr><td>3.3 Morning Cash Hand off Total</td><td><input id="s3-morning" oninput="calcAll()"></td></tr>
+      <tr><td>3.4 Day Total</td><td><input id="s3-daytotal" oninput="calcAll()"></td></tr>
+      <tr><td>3.5 Old Credit Cash hand off <span style="font-weight:400;font-size:11px">[CONFIRMED 2026-08-25: now INCLUDED in Total below — reverses the 2026-08-16 "Remove the Row" exclusion; see BRD 5.8.5]</span></td><td><input id="s3-oldcredit" oninput="calcAll()"></td></tr>
+      <tr class="total-row"><td>3.6 Total</td><td><input id="s3-total6" disabled placeholder="auto"></td></tr>
+      <tr><td>3.7 Old Cash + Current Day Total</td><td><input id="s3-total7" disabled placeholder="auto"></td></tr>
+      <tr><td>3.8 IOCL Card End Balance (-)</td><td><input id="s3-iocl" oninput="calcAll()"></td></tr>
+      <tr><td>3.9 Indian Bank Statement Ending Balance <span style="color:var(--io-red);font-weight:700">(@Fraud Pending — see note)</span></td><td><input id="s3-indianbank" oninput="calcAll()"></td></tr>
+      <tr><td>3.10 Yes Bank Statement Ending Balance</td><td><input id="s3-yesbank" oninput="calcAll()"></td></tr>
+      <tr><td>3.11 Phone Pay Unsettled Amt</td><td><input id="s3-ppunsettled" oninput="calcAll()"></td></tr>
+      <tr><td>3.12 Phone Pay Settled Amt (Already Reflects in Indian Bank Statement)</td><td><input id="s3-ppsettled" disabled value="0"></td></tr>
+      <tr class="total-row"><td>3.13 Total Amt</td><td><input id="s3-total13" disabled placeholder="auto"></td></tr>
+      <tr><td colspan="2" style="font-weight:700;background:#eef1fa">3.14 New Credit / Salary Adv <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewOption(s3CreditorOpts, 's3-creditor-name', 'creditor/advance type', 's3-creditor-status')">+ New Type</button></td></tr>
+      <tr><th>Type</th><th>Amount</th></tr>
+      <tbody id="body-s3-creditors">
+      <tr><td>
+        <select class="s3-creditor-name">
+          <option value="">— select —</option>
+          <option>Anil/Nani New Credit</option>
+          <option>AirTel Hari New Credit</option>
+          <option>Salary Advance Viaj</option>
+          <option>Salary Advance Ashok</option>
+          <option>Salary Advance Sriharsha</option>
+          <option>Salary Advance Ravindra</option>
+          <option>Sajja Function Hall - New Credit</option>
+        </select>
+      </td><td><input class="s3-creditor" oninput="calcAll()"></td></tr>
+      <tr><td>
+        <select class="s3-creditor-name">
+          <option value="">— select —</option>
+          <option>Anil/Nani New Credit</option>
+          <option>AirTel Hari New Credit</option>
+          <option>Salary Advance Viaj</option>
+          <option>Salary Advance Ashok</option>
+          <option>Salary Advance Sriharsha</option>
+          <option>Salary Advance Ravindra</option>
+          <option>Sajja Function Hall - New Credit</option>
+        </select>
+      </td><td><input class="s3-creditor" oninput="calcAll()"></td></tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addRow3Creditors()">+ Add row</button>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:4px 0 0">Dropdown list is provisioned for growth — use "+ New Type" above to add a new creditor/advance name (e.g. a new customer requesting credit), immediately available in every row, without restructuring the form.</p>
+    <p id="s3-creditor-status" style="font-size:12px;color:var(--io-blue-dark);margin:2px 0 0;min-height:16px"></p>
+
+    <table style="margin-top:12px">
+      <tr><td colspan="2" style="font-weight:700;background:#eef1fa">Expenses <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewOption(s3ExpOpts, ['s3-exp-category','s8-exp-category'], 'expense category', 's3-exp-status')">+ New Category</button></td></tr>
+      <tr><th>Category</th><th>Amount</th></tr>
+      <tbody id="body-s3-expenses">
+      <tr><td>
+        <select class="s3-exp-category">
+          <option value="">— select —</option>
+          <option>Salaries Mid/End of Month - Total</option>
+          <option>Power Bill</option>
+          <option>Unload Beta</option>
+          <option>Salary Advances Total</option>
+        </select>
+      </td><td><input class="s3-exp-amount" oninput="calcAll()"></td></tr>
+      <tr><td>
+        <select class="s3-exp-category">
+          <option value="">— select —</option>
+          <option>Salaries Mid/End of Month - Total</option>
+          <option>Power Bill</option>
+          <option>Unload Beta</option>
+          <option>Salary Advances Total</option>
+        </select>
+      </td><td><input class="s3-exp-amount" oninput="calcAll()"></td></tr>
+      <tr><td>
+        <select class="s3-exp-category">
+          <option value="">— select —</option>
+          <option>Salaries Mid/End of Month - Total</option>
+          <option>Power Bill</option>
+          <option>Unload Beta</option>
+          <option>Salary Advances Total</option>
+        </select>
+      </td><td><input class="s3-exp-amount" oninput="calcAll()"></td></tr>
+      <tr><td>
+        <select class="s3-exp-category">
+          <option value="">— select —</option>
+          <option>Salaries Mid/End of Month - Total</option>
+          <option>Power Bill</option>
+          <option>Unload Beta</option>
+          <option>Salary Advances Total</option>
+        </select>
+      </td><td><input class="s3-exp-amount" oninput="calcAll()"></td></tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addRow3Expenses()">+ Add row</button>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:4px 0 0">Category dropdown provisioned for growth, same as above — use "+ New Category" to add one.</p>
+    <p id="s3-exp-status" style="font-size:12px;color:var(--io-blue-dark);margin:2px 0 0;min-height:16px"></p>
+
+    <table style="margin-top:12px">
+      <tr><td colspan="3" style="font-weight:700;background:#eef1fa">Credit Remittance <span style="font-weight:400;font-size:11px">[Remove/Update the Row Above]</span> <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewOption(s3RemitOpts, 's3-remit-name', 'remittance type', 's3-remit-status')">+ New Type</button></td></tr>
+      <tr><th>Type</th><th>Credit Given on Date</th><th>Amt</th></tr>
+      <tbody id="body-s3-remittance">
+      <tr><td>
+        <select class="s3-remit-name">
+          <option value="">— select —</option>
+          <option>Sajja Old Credit Remitted Amt</option>
+          <option>Anil/Nani Old Credit Remitted Amt</option>
+          <option>AirTel Hari Old Credit Remitted Amt</option>
+          <option>AirTel New Credit Remitted Amt</option>
+        </select>
+      </td><td><input type="date"></td><td><input class="s3-remit-amt" oninput="calcAll()"></td></tr>
+      <tr><td>
+        <select class="s3-remit-name">
+          <option value="">— select —</option>
+          <option>Sajja Old Credit Remitted Amt</option>
+          <option>Anil/Nani Old Credit Remitted Amt</option>
+          <option>AirTel Hari Old Credit Remitted Amt</option>
+          <option>AirTel New Credit Remitted Amt</option>
+        </select>
+      </td><td><input type="date"></td><td><input class="s3-remit-amt" oninput="calcAll()"></td></tr>
+      <tr><td>
+        <select class="s3-remit-name">
+          <option value="">— select —</option>
+          <option>Sajja Old Credit Remitted Amt</option>
+          <option>Anil/Nani Old Credit Remitted Amt</option>
+          <option>AirTel Hari Old Credit Remitted Amt</option>
+          <option>AirTel New Credit Remitted Amt</option>
+        </select>
+      </td><td><input type="date"></td><td><input class="s3-remit-amt" oninput="calcAll()"></td></tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addRow3Remittance()">+ Add row</button>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:4px 0 0">Name dropdown provisioned for growth, same pattern as above — use "+ New Type" to add one. Exact relationship of this block's totals to 3.13/3.15 above was not confirmed from the available AUG25 data (both Expenses and Credit Remittance show mostly blank/zero that day) — captured as its own tracked block rather than assumed to feed into a specific upstream total.</p>
+    <p id="s3-remit-status" style="font-size:12px;color:var(--io-blue-dark);margin:2px 0 0;min-height:16px"></p>
+
+    <table style="margin-top:12px">
+      <tr class="total-row"><td>3.15 Total Cash/Book Amount as of Today</td><td><input id="s3-total17" disabled placeholder="auto"></td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">Creditor names are a dropdown list, matching the AUG25 source's Excel Data Validation exactly (Anil/Nani New Credit, AirTel Hari New Credit, Salary Advance Viaj/Ashok/Sriharsha/Ravindra, Sajja Function Hall - New Credit).</p>
+
+    <div class="section-title">4. <span class="title-text" data-en="Cash/Book Value Reconciliation" data-te="నగదు/పుస్తక విలువ సరిపోలిక">Cash/Book Value Reconciliation</span></div>
+    <table>
+      <tr><td>4.1 Yesterday SVR Cash/Book Value</td><td><input id="s4-yesterday" disabled placeholder="auto (= prior day's 3.15)" title="Auto-carried from the PRIOR day's Section 3.15 Total Cash/Book Amount."></td></tr>
+      <tr><td>4.2 Total Today Sale Amount After Expenses (Beta,Testing and Density)</td><td><input id="s4-todaysale" oninput="calcAll()"></td></tr>
+      <tr class="total-row"><td>4.3 Total - Projected</td><td><input id="s4-total3" disabled placeholder="auto"></td></tr>
+      <tr><td>4.4 Today SVR Cash/Book Value Reported</td><td><input id="s4-reported" disabled placeholder="auto (= 3.15)"></td></tr>
+      <tr><td>4.5 Diff Reported - Projected <span style="font-weight:400;font-size:11px">[CONFIRMED threshold, from AUG25 note: OK if within Rs 100, else call/inform mgmt immediately]</span></td><td><input id="s4-diff" disabled placeholder="auto"></td></tr>
+    </table>
+
+    <div class="section-title">5. <span class="title-text" data-en="Stock Value" data-te="నిల్వ విలువ">Stock Value</span></div>
+    <table>
+      <tr><th></th><th>Ltrs</th><th>Rate</th><th>Amount</th></tr>
+      <tr><td>5.1 Diesel (HS)</td><td><input id="s5-hs-ltrs" disabled placeholder="auto (= Section 1 IOCL Current)"></td><td><input id="s5-hs-rate" disabled value="102.75" title="Default Buy Rate HS, locked. Only changes via Rate Master's Supervisor/Owner-only Push Rate Update. Inventory valued at cost."></td><td><input id="s5-hs-amt" disabled placeholder="auto"></td></tr>
+      <tr><td>5.2 Petrol (MS)</td><td><input id="s5-ms-ltrs" disabled placeholder="auto (= Section 1 IOCL Current)"></td><td><input id="s5-ms-rate" disabled value="113.56" title="Default Buy Rate MS, locked. Only changes via Rate Master's Supervisor/Owner-only Push Rate Update. Inventory valued at cost."></td><td><input id="s5-ms-amt" disabled placeholder="auto"></td></tr>
+      <tr class="total-row"><td colspan="3">5.3 Total Stock Value</td><td><input id="s5-total" disabled placeholder="auto"></td></tr>
+    </table>
+
+    <div class="section-title">6. <span class="title-text" data-en="Trial Balance - Actual Reported - Today" data-te="ట్రయల్ బ్యాలెన్స్ - వాస్తవ నివేదిక - నేడు">Trial Balance - Actual Reported - Today</span></div>
+    <table>
+      <tr><th></th><th>Amount</th></tr>
+      <tr><td>6.1 Today's Actual Reported SVR Cash/Book Value</td><td><input id="s6-cash" disabled placeholder="auto (= 4.4)"></td></tr>
+      <tr><td>6.2 Today's Closing Stock Value</td><td><input id="s6-stock" disabled placeholder="auto (= 5.3)"></td></tr>
+      <tr class="total-row"><td>Today's Total Working Capital / Net Worth</td><td><input id="s6-total" disabled placeholder="auto"></td></tr>
+    </table>
+
+    <div class="section-title">7. <span class="title-text" data-en="Trial Balance - Projected - Today" data-te="ట్రయల్ బ్యాలెన్స్ - అంచనా - నేడు">Trial Balance - Projected - Today</span> <span style="font-weight:400;font-size:11px">[More Value Depends on Consump Difference]</span></div>
+    <table>
+      <tr><th></th><th>Amount</th></tr>
+      <tr><td>7.1 Yesterday's Actual Reported Trial Balance</td><td><input id="s7-yesterday" disabled placeholder="auto (= prior day's Total Working Capital)" title="Auto-carried from the PRIOR day's Section 6 Total Working Capital/Networth — the real/actual total, not the prior day's own projected total."></td></tr>
+      <tr><td>7.2 Today's Profit Including 2T Sales</td><td><input id="s7-profit" disabled placeholder="auto (= Section 1's Total Sale Amt)"></td></tr>
+      <tr class="total-row"><td>7.3 Today's Projected Trial Balance</td><td><input id="s7-total3" disabled placeholder="auto"></td></tr>
+      <tr><td>7.4 Difference – Actual Reported Minus Projected</td><td><input id="s7-diff" disabled placeholder="auto"></td></tr>
+      <tr class="total-row"><td>7.5 Today's Actual Reported Trial Balance</td><td><input id="s7-total5" disabled placeholder="auto (= Section 6 Total)"></td></tr>
+    </table>
+
+    <div class="summary-box" style="margin-top:18px">
+      <h3>8. <span class="title-text" data-en="Daily Management Reporting" data-te="రోజువారీ నిర్వహణ నివేదిక">Daily Management Reporting</span></h3>
+      <div class="summary-row"><span>8.1 Yesterday's SVR Cash/Book Value</span><span><input id="s8-1" disabled placeholder="auto (= 4.1)" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>8.2 Today's Sales After Expenses, Testing and Density Adjustments</span><span><input id="s8-2" disabled placeholder="auto (= 4.2)" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>8.3 Projected SVR Cash/Book Value <span style="font-weight:400;font-size:10px">[# Duplicate Section for mgmt Reporting 4.Cash Reconciliation]</span></span><span><input id="s8-3" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>8.4 Actual Reported SVR Cash/Book Value</span><span><input id="s8-4" disabled placeholder="auto (= 4.4)" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>8.5 Difference – Actual Reported Minus Projected</span><span><input id="s8-5" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row" style="font-weight:700;background:#eef1fa"><span>Regular Expenses <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewOption(s3ExpOpts, ['s3-exp-category','s8-exp-category'], 'expense category', 's8-exp-status')">+ New Category</button></span><span></span></div>
+      <div class="summary-row"><span></span><span></span></div>
+      <p style="font-size:11px;color:var(--io-blue-dark);margin:2px 0 6px">CONFIRMED (2026-08-28): Monthly Expenses is the source for these figures — entries here should be pulled from today's dated rows there, not typed independently as a second record of the same real-world expense.</p>
+      <p id="s8-exp-status" style="font-size:12px;color:var(--io-blue-dark);margin:2px 0 6px;min-height:16px"></p>
+      <div id="body-s8-expenses">
+      <div class="summary-row">
+        <span>
+          <select class="s8-exp-category" onchange="calcAll()">
+            <option value="">— category —</option>
+            <option>Salaries Mid/End of Month - Total</option>
+            <option>Power Bill</option>
+            <option>Unload Beta</option>
+            <option>Salary Advances Total</option>
+          </select>
+        </span>
+        <span><input class="s8-exp-amount" oninput="calcAll()" style="width:120px;text-align:right"></span>
+      </div>
+      <div class="summary-row">
+        <span>
+          <select class="s8-exp-category" onchange="calcAll()">
+            <option value="">— category —</option>
+            <option>Salaries Mid/End of Month - Total</option>
+            <option>Power Bill</option>
+            <option>Unload Beta</option>
+            <option>Salary Advances Total</option>
+          </select>
+        </span>
+        <span><input class="s8-exp-amount" oninput="calcAll()" style="width:120px;text-align:right"></span>
+      </div>
+      <div class="summary-row">
+        <span>
+          <select class="s8-exp-category" onchange="calcAll()">
+            <option value="">— category —</option>
+            <option>Salaries Mid/End of Month - Total</option>
+            <option>Power Bill</option>
+            <option>Unload Beta</option>
+            <option>Salary Advances Total</option>
+          </select>
+        </span>
+        <span><input class="s8-exp-amount" oninput="calcAll()" style="width:120px;text-align:right"></span>
+      </div>
+      </div>
+      <div style="text-align:right;margin:2px 0 6px"><button type="button" class="add-row-btn" style="margin:0" onclick="addRow8Expenses()">+ Add row</button></div>
+      <div style="text-align:right;margin:4px 0 6px"><button type="button" class="export-btn secondary" onclick="updateFromMonthlyExpensesDemo()">Update from Monthly Expenses (Today)</button></div>
+      <p id="s8-monthly-pull-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:2px 0 6px;min-height:16px"></p>
+      <div class="summary-row"><span>Total Regular Expenses</span><span><input id="s8-exptotal" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row" style="font-weight:700;background:#eef1fa"><span>Old Credit Collections <span style="font-weight:400;font-size:10px">[Remove/Update the row above]</span> <button type="button" class="add-row-btn" style="margin:0 0 0 8px;font-weight:400;font-size:11px;padding:2px 8px" onclick="addNewOption(s8RemitOpts, 's8-remit-name', 'remittance type', 's8-remit-status')">+ New Type</button></span><span></span></div>
+      <p id="s8-remit-status" style="font-size:12px;color:var(--io-blue-dark);margin:2px 0 6px;min-height:16px"></p>
+      <div id="body-s8-remittance">
+      <div class="summary-row">
+        <span>
+          <select class="s8-remit-name">
+            <option value="">— select —</option>
+            <option>Sajja Old Credit Remitted Amt</option>
+            <option>Anil Old Credit Remitted</option>
+            <option>AirTel Hari Old Credit Remitted</option>
+            <option>AirTel New Credit Remitted</option>
+          </select>
+        </span>
+        <span><input class="s8-remit-amt" oninput="calcAll()" style="width:120px;text-align:right"></span>
+      </div>
+      <div class="summary-row">
+        <span>
+          <select class="s8-remit-name">
+            <option value="">— select —</option>
+            <option>Sajja Old Credit Remitted Amt</option>
+            <option>Anil Old Credit Remitted</option>
+            <option>AirTel Hari Old Credit Remitted</option>
+            <option>AirTel New Credit Remitted</option>
+          </select>
+        </span>
+        <span><input class="s8-remit-amt" oninput="calcAll()" style="width:120px;text-align:right"></span>
+      </div>
+      </div>
+      <div style="text-align:right;margin:2px 0 6px"><button type="button" class="add-row-btn" style="margin:0" onclick="addRow8Remittance()">+ Add row</button></div>
+      <div class="summary-row net"><span>Cash Value Difference – Escalate if Absolute Difference Exceeds ₹100</span><span><input id="s8-diffstatus" disabled placeholder="auto (= 8.5)" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row" style="font-weight:700;background:#eef1fa"><span>Today Trial Balance Reporting - Total SVR Networth</span><span></span></div>
+      <div class="summary-row"><span>Yesterday's Actual Reported Trial Balance</span><span><input id="s8-networth-yest" oninput="calcAll()" title="CORRECTED (2026-08-25): this is an INDEPENDENT carry-forward from Section 8's own prior-day value — NOT the same as Section 7.1. Verified against real AUG25 data: the two figures genuinely differ (3,240,917 here vs 3,245,120.79 in 7.1 that same day)." style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Daily Profit Including 2T Sales</span><span><input id="s8-networth-profit" disabled placeholder="auto (= 7.2)" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Projected SVR Net Worth</span><span><input id="s8-networth-projected" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Actual Reported SVR Net Worth</span><span><input id="s8-networth-reported" disabled placeholder="auto (= 6 Total Working Capital)" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row net"><span>Difference – Actual Reported Minus Projected</span><span><input id="s8-networth-diff" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Actual Profit After Regular Expenses Rs3300</span><span><input id="s8-actualprofit" disabled placeholder="auto (= Diff - SVR Expenses Total)" title="UNCONFIRMED formula — see BRD 5.8.5 for the reasoning and open flag." style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Prepared by</span><span><input type="text" style="width:120px"></span></div>
+      <div class="summary-row"><span>Verified by</span><span><input type="text" style="width:120px"></span></div>
+      <div class="summary-row"><span>Sent to SVR and Bank Statement to Group Email BY</span><span><input type="text" style="width:120px"></span></div>
+      <div class="summary-row"><span>Send Report to WhatsApp Number</span><span><input type="text" id="s8-whatsapp" placeholder="+91 XXXXX XXXXX" style="width:120px"></span></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px">
+        <button type="button" class="export-btn secondary" onclick="exportSection8()"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Export Section 8 to Excel</button>
+      </div>
+      <p id="s8-export-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+    </div>
+
+    <div class="section-title">9. <span class="title-text" data-en="Daily Mgr Calculation" data-te="రోజువారీ మేనేజర్ లెక్కింపు">Daily Mgr Calculation</span> <span style="font-weight:400;font-size:11px">[running ledger — one table, not re-created per day — scrolls horizontally]</span></div>
+    <div style="overflow-x:auto;border:1px solid var(--line);border-radius:0 0 6px 6px">
+    <table id="tbl-mgr-calc" style="min-width:3400px;border:none;border-radius:0">
+      <tr><th>Date</th><th>Total MS Sale</th><th>Total HS Sale</th><th>MS Deduct Testing</th><th>HS Deduct Testing</th><th>MS Total Rs</th><th>HS Total Rs</th><th>Total Sales Rs</th><th>Daily Expenses (Tiffins/Unloads)</th><th>2T Sale</th><th>Total Sale</th><th>Settled Phone Pay</th><th>UnSettled Phone Pay</th><th>Fleet Card Swipe</th><th>Credit Card Swipe</th><th>Credit (Any)</th><th>Night Cash - Total</th><th>Day Cash - Total</th><th>Total Cash After All</th><th>Difference</th><th>Bank Deposits (Any)</th><th>MS Comm</th><th>HS Comm</th><th>Total Comm</th><th>Day Profit</th><th>2T Sales</th></tr>
+      <tbody id="body-mgr-calc">
+      <tr><td><input type="date"></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <button type="button" class="add-row-btn" onclick="addRow('body-mgr-calc',26,true)">+ Add row</button>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">CORRECTED (2026-08-25): full 26-column structure restored — the prior AUG25 rebuild incorrectly reduced this to 8 columns based on an incomplete extraction that didn't scroll far enough right in the source sheet; all 26 columns are confirmed present with real data in the actual AUG25 tab. CHANGED: now starts with just 5 rows (was 30) — end users add more via "+ Add row" as needed, rather than the form pre-populating a month's worth up front.</p>
+
+    <div class="section-title">10. <span class="title-text" data-en="Load/Unload Details" data-te="లోడ్/అన్‌లోడ్ వివరాలు">Load/Unload Details</span> <span style="font-weight:400;font-size:11px">[applicable only when IOCL delivers the load]</span></div>
+    <table id="tbl-loadunload">
+      <tr><th>Fuel</th><th>After Unload Comp</th><th>Old Reading</th><th>New Computer</th><th>IOCL Load</th><th>Lost</th><th>Total</th></tr>
+      <tbody id="body-loadunload">
+      <tr><td>Diesel (HS) - Vehicle</td><td><input id="s10-hs-afterunload" oninput="calcAll()"></td><td><input id="s10-hs-old" disabled placeholder="auto (= last delivery's New Computer)" title="Auto-carried from this fuel's most recent Load/Unload entry."></td><td><input id="s10-hs-new" oninput="calcAll()"></td><td><input id="s10-hs-load" oninput="calcAll()"></td><td><input id="s10-hs-lost" oninput="calcAll()"></td><td><input id="s10-hs-total" disabled placeholder="auto"></td></tr>
+      <tr><td>Petrol (MS) - Vehicle</td><td><input id="s10-ms-afterunload" oninput="calcAll()"></td><td><input id="s10-ms-old" disabled placeholder="auto (= last delivery's New Computer)" title="Auto-carried from this fuel's most recent Load/Unload entry."></td><td><input id="s10-ms-new" oninput="calcAll()"></td><td><input id="s10-ms-load" oninput="calcAll()"></td><td><input id="s10-ms-lost" oninput="calcAll()"></td><td><input id="s10-ms-total" disabled placeholder="auto"></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">CONFIRMED: Total = New Computer &minus; Old Computer (Lost tracked separately). Moved from Section 2 to Section 10, matching AUG25's structure exactly.</p>
+
+    <div class="section-title">11. <span class="title-text" data-en="Old/New Credit Sales Details" data-te="పాత/కొత్త క్రెడిట్ అమ్మకాల వివరాలు">Old/New Credit Sales Details</span> <span style="font-weight:400;font-size:11px">[Credit Master Entry]</span></div>
+    <table>
+      <tr><td>New Airtel Balance</td><td><input id="s11-new-airtel"></td></tr>
+      <tr><td>Old Airtel Balance</td><td><input id="s11-old-airtel"></td></tr>
+    </table>
+    <p style="font-size:11px;color:var(--io-red);margin:4px 0 0">NEW SECTION (2026-08-25) — not previously in this BRD. AUG25 shows only 2 rows (Airtel balances); exact scope/purpose of this section as a whole is not yet clear from one day's data. Flagged for client confirmation rather than expanded speculatively.</p>
+
+    <div class="summary-box">
+      <h3>Sync Master Data</h3>
+      <div class="summary-row"><span>Recommendation, not a button: a shared database (already planned — Section 4, Python + SQLite) means Rate Master, Inventory/Stock Master, Monthly Expenses, and Employee Master never need "syncing" at all — every form reads the same live table. This Trial Balance form's auto-pull fields (Sell/Buy Rate, Section 1 Consumption, etc.) are already designed for exactly this once the real backend exists.</span><span></span></div>
+      <div style="text-align:right;margin:8px 0">
+        <button type="button" class="export-btn secondary" onclick="demoSyncMasterData()">Sync Now (Demo)</button>
+      </div>
+      <p id="sync-status" style="font-size:12px;color:var(--io-blue-dark);margin:4px 0 0;min-height:16px"></p>
+    </div>
+
+    <div class="export-bar">
+      <button type="button" class="export-btn" onclick="saveFormDemo()" style="order:-1"><i class="ti ti-device-floppy" style="margin-right:6px;font-size:14px"></i>Save</button>
+      <button type="button" class="export-btn secondary" onclick="window.print()"><i class="ti ti-printer" style="margin-right:6px;font-size:14px"></i>Print</button>
+      <button type="button" class="export-btn secondary" onclick="importFromExcel()"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Import from Excel</button>
+      <button type="button" class="export-btn"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Export Full Trial Balance to Excel</button>
+    </div>
+    <p id="save-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+    <p style="font-size:11px;color:var(--io-blue-dark);text-align:right;margin:2px 0 0">Import / Export covers Sections 1–11 for the selected day (not the header meta-fields or Prepared/Verified/Sent By fields)</p>
+    <p id="import-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+
+    <div class="verify-grid">
+      <div class="field"><label>Mgr Name</label><input id="mgr-name" disabled placeholder="auto (Logged in as, on Save)"></div>
+      <div class="field"><label>Signature</label><input type="text"></div>
+      <div class="field"><label>Date</label><input type="text"></div>
+    </div>
+
+  </div>
+</div>
+<script>
+function saveFormDemo() {
+  // DEMO only, honestly limited: no backend or database exists in this static
+  // mockup, so there is nowhere real to save to. A real Save would write this
+  // form's data to the shared SQLite backend (BRD Section 4). This button
+  // demonstrates the confirmation UX, not a working save.
+  // CONFIRMED (2026-08-27): whoever is logged in when Save is pressed is who gets
+  // recorded — Prepared By/Mgr Name no longer manually typed, auto-filled here.
+  var status = document.getElementById('save-status');
+  var loggedInAs = document.getElementById('logged-in-as').value;
+  if (!loggedInAs) {
+    status.textContent = 'Select "Logged in as" above before saving — this is who gets recorded against this entry.';
+    status.style.color = 'var(--io-red)';
+    return;
+  }
+  document.getElementById('prepared-by').value = loggedInAs;
+  document.getElementById('mgr-name').value = loggedInAs;
+  var now = new Date();
+  var timeStr = now.toLocaleString();
+  document.getElementById('last-updated-by').textContent = loggedInAs;
+  document.getElementById('last-updated-time').textContent = timeStr;
+  status.textContent = 'Demo: entries would be saved to the database as of ' + timeStr + ' by ' + loggedInAs + '. Real persistence requires the backend (BRD Section 4), not implemented in this static mockup.';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function num(id) {
+  var el = document.getElementById(id);
+  if (!el) return 0;
+  var n = parseFloat(el.value);
+  return isNaN(n) ? 0 : n;
+}
+function round4(n) { return Math.round(n * 10000) / 10000; }
+function setVal(id, val) { var el = document.getElementById(id); if (el) el.value = round4(val); }
+function sumClass(cls) {
+  var els = document.getElementsByClassName(cls);
+  var total = 0;
+  for (var i = 0; i < els.length; i++) {
+    var n = parseFloat(els[i].value);
+    if (!isNaN(n)) total += n;
+  }
+  return total;
+}
+function sumClassByCategory(selectCls, amountCls, category) {
+  var selects = document.getElementsByClassName(selectCls);
+  var amounts = document.getElementsByClassName(amountCls);
+  var total = 0;
+  for (var i = 0; i < selects.length; i++) {
+    if (selects[i].value === category) {
+      var n = parseFloat(amounts[i].value);
+      if (!isNaN(n)) total += n;
+    }
+  }
+  return total;
+}
+
+function calcAll() {
+  // === Section 1: IOCL Stock Readings ===
+  // Confirmed against real AUG25 data: Diff=Last-Current; Consumption pulled from
+  // Section 2; Consump Diff=Consumption-Diff; Daily Testing=Consumption-10.5;
+  // Margin=Daily Testing x margin-rate (2.61 HS, 4.14 MS); Margin Total/2T
+  // Sales/Total Sale Amt/IOCL Profit shown once, combining both fuels.
+  setVal('s1-hs-diff', num('s1-hs-last') - num('s1-hs-curr'));
+  setVal('s1-ms-diff', num('s1-ms-last') - num('s1-ms-curr'));
+
+  // === Section 2: Day Sales Report (pulled from Daily Sales Report) ===
+  ['office-hs', 'office-ms', 'road-hs', 'road-ms'].forEach(function(row) {
+    var today = num('s2-' + row + '-today');
+    var last = num('s2-' + row + '-last');
+    var cons = today - last;
+    setVal('s2-' + row + '-cons', cons);
+    var rate = num('s2-' + row + '-rate');
+    setVal('s2-' + row + '-amt', cons * rate);
+  });
+  var totalHsSum = num('s2-office-hs-cons') + num('s2-road-hs-cons');
+  var totalMsSum = num('s2-office-ms-cons') + num('s2-road-ms-cons');
+  var totalHsAmt = num('s2-office-hs-amt') + num('s2-road-hs-amt');
+  var totalMsAmt = num('s2-office-ms-amt') + num('s2-road-ms-amt');
+  var totalAmtFuel = totalHsAmt + totalMsAmt;
+  setVal('s2-total-ltrs', totalAmtFuel);
+  // Oil Sales: Amount = Sold x Rate; Closing Stock = Opening Stock - Sold, feeding
+  // back to Inventory Tracking as its new Closing Stock (Opening auto-pulls from
+  // there). CONFIRMED against real AUG25 data (e.g. 2T/1.50 ML: 9 x 17 = 153).
+  var oilTotal = 0;
+  for (var oi = 1; oi <= 5; oi++) {
+    var qty = num('s2-oil' + oi + '-qty');
+    var rate = num('s2-oil' + oi + '-rate');
+    var amt = qty * rate;
+    setVal('s2-oil' + oi + '-amt', amt);
+    oilTotal += amt;
+    var opening = num('s2-oil' + oi + '-open');
+    setVal('s2-oil' + oi + '-close', opening - qty);
+  }
+  // Dynamically-added oil items (via "+ Add Oil Item"), same pattern as the 5 fixed
+  // rows above but iterated by class since these rows don't have fixed IDs.
+  document.querySelectorAll('#body-oil-extra tr').forEach(function(row) {
+    var qtyEl = row.querySelector('.oilx-qty');
+    var rateEl = row.querySelector('.oilx-rate');
+    var openEl = row.querySelector('.oilx-open');
+    var qtyX = parseFloat(qtyEl.value) || 0;
+    var rateX = parseFloat(rateEl.value) || 0;
+    var openX = parseFloat(openEl.value) || 0;
+    var amtX = qtyX * rateX;
+    row.querySelector('.oilx-amt').value = round4(amtX);
+    row.querySelector('.oilx-close').value = round4(openX - qtyX);
+    oilTotal += amtX;
+  });
+  setVal('s2-oil-subtotal', oilTotal);
+  setVal('s2-daily-total', totalAmtFuel + oilTotal);
+
+  // Section 1 Consumption pulled from Section 2's totals (cross-section dependency)
+  setVal('s1-hs-cons', totalHsSum);
+  setVal('s1-ms-cons', totalMsSum);
+  var s1HsConsDiff = totalHsSum - num('s1-hs-diff');
+  var s1MsConsDiff = totalMsSum - num('s1-ms-diff');
+  setVal('s1-hs-consdiff', s1HsConsDiff);
+  setVal('s1-ms-consdiff', s1MsConsDiff);
+  var s1HsTesting = totalHsSum - 10; // CORRECTED AGAIN (2026-08-28): client directly
+  // corrected the -10.5 figure — the actual value is -10 for HS and -10 Lts for MS,
+  // each independently. This is the third time this specific constant has changed
+  // (10 -> 10.5 -> a mistaken 21 -> 10.5 confirmed -> now 10 again, confirmed
+  // directly). Kept as a flat, independent-per-fuel deduction, same structure as
+  // before — only the number itself changed
+  var s1MsTesting = totalMsSum - 10;
+  setVal('s1-hs-testing', s1HsTesting);
+  setVal('s1-ms-testing', s1MsTesting);
+  var s1HsMargin = s1HsTesting * 2.61;
+  var s1MsMargin = s1MsTesting * 4.14;
+  setVal('s1-hs-margin', s1HsMargin);
+  setVal('s1-ms-margin', s1MsMargin);
+  var marginTotal = s1HsMargin + s1MsMargin;
+  setVal('s1-ms-margintotal', marginTotal);
+  // CORRECTED (2026-08-26): "2T Sales" = the FULL Oil Sales subtotal (all 5 items),
+  // not just the two "2T"-named rows as previously assumed — confirmed exact on both
+  // AUG25 (153=153) and AUG26 (255=255) against the real source spreadsheet.
+  var twoTSales = oilTotal;
+  setVal('s1-ms-2tsales', twoTSales);
+  var totalSaleAmt = marginTotal + twoTSales;
+  setVal('s1-ms-totalsale', totalSaleAmt);
+  var ioclProfit = num('s1-hs-iocladv') + num('s1-ms-iocladv');
+  setVal('s1-ms-ioclprofit', ioclProfit);
+
+  // === Section 3: Daily Cash & Bank Balances ===
+  // CONFIRMED 2026-08-25: Old Credit Cash hand off (3.5) IS included in the Total —
+  // reverses the earlier "Remove the Row" exclusion.
+  var s3total6 = num('s3-onhand') + num('s3-night') + num('s3-morning') + num('s3-daytotal') + num('s3-oldcredit');
+  setVal('s3-total6', s3total6);
+  setVal('s3-total7', s3total6);
+  var s3total13 = num('s3-total7') + num('s3-iocl') + num('s3-indianbank') + num('s3-yesbank') + num('s3-ppunsettled') + num('s3-ppsettled');
+  setVal('s3-total13', s3total13);
+  var creditorSum = sumClass('s3-creditor');
+  var s3ExpSum = sumClass('s3-exp-amount'); // tracked separately, relationship to totals above unconfirmed (see BRD 5.8.6)
+  var s3RemitSum = sumClass('s3-remit-amt'); // tracked separately, same reason
+  var s3total17 = s3total13 + creditorSum;
+  setVal('s3-total17', s3total17);
+
+  // === Section 4: Cash/Book Value Reconciliation ===
+  var s4total3 = num('s4-yesterday') + num('s4-todaysale');
+  setVal('s4-total3', s4total3);
+  setVal('s4-reported', s3total17);
+  setVal('s4-diff', s3total17 - s4total3);
+
+  // === Section 5: Stock Value ===
+  setVal('s5-hs-ltrs', num('s1-hs-curr'));
+  setVal('s5-ms-ltrs', num('s1-ms-curr'));
+  var s5HsAmt = num('s5-hs-ltrs') * num('s5-hs-rate');
+  var s5MsAmt = num('s5-ms-ltrs') * num('s5-ms-rate');
+  setVal('s5-hs-amt', s5HsAmt);
+  setVal('s5-ms-amt', s5MsAmt);
+  var s5total = s5HsAmt + s5MsAmt;
+  setVal('s5-total', s5total);
+
+  // === Section 6: Trail Balance - Actual Reported - Today ===
+  setVal('s6-cash', num('s4-reported'));
+  setVal('s6-stock', s5total);
+  var s6total = num('s4-reported') + s5total;
+  setVal('s6-total', s6total);
+
+  // === Section 7: Trail Balance - Projected - Today ===
+  setVal('s7-profit', totalSaleAmt);
+  var s7total3 = num('s7-yesterday') + totalSaleAmt;
+  setVal('s7-total3', s7total3);
+  setVal('s7-diff', s6total - s7total3);
+  setVal('s7-total5', s6total);
+
+  // === Section 8: Daily Mgmt Reporting ===
+  setVal('s8-1', num('s4-yesterday'));
+  setVal('s8-2', num('s4-todaysale'));
+  setVal('s8-3', s4total3);
+  setVal('s8-4', num('s4-reported'));
+  var s8diff = s3total17 - s4total3;
+  setVal('s8-5', s8diff);
+  var expCategories = ['Salaries Mid/End of Month - Total', 'Power Bill', 'Unload Beta', 'Salary Advances Total'];
+  var expTotal = sumClass('s8-exp-amount');
+  setVal('s8-exptotal', expTotal);
+  var s8RemitSum = sumClass('s8-remit-amt'); // tracked separately, relationship to other totals unconfirmed (see BRD 5.8.6)
+  setVal('s8-diffstatus', s8diff);
+  // s8-networth-yest is now an independent field (see 2026-08-25 correction), not auto-set here
+  setVal('s8-networth-profit', totalSaleAmt);
+  var s8NetworthProjected = num('s8-networth-yest') + totalSaleAmt;
+  setVal('s8-networth-projected', s8NetworthProjected);
+  setVal('s8-networth-reported', s6total);
+  var s8NetworthDiff = s6total - s8NetworthProjected;
+  setVal('s8-networth-diff', s8NetworthDiff);
+  setVal('s8-actualprofit', s8NetworthDiff - expTotal);
+
+  // === Section 10: Load/Unload Details ===
+  // CONFIRMED: Total = New Computer - Old Computer
+  ['hs', 'ms'].forEach(function(fuel) {
+    var newComp = num('s10-' + fuel + '-new');
+    var oldComp = num('s10-' + fuel + '-old');
+    setVal('s10-' + fuel + '-total', newComp - oldComp);
+  });
+}
+
+function exportSection8() {
+  // DEMO only — a real export would generate an .xlsx of Section 8's fields and, if
+  // a WhatsApp number is entered, send it there via a backend WhatsApp Business API
+  // integration (not yet designed — see BRD). No file generation or messaging
+  // happens in this static mockup.
+  var status = document.getElementById('s8-export-status');
+  var wa = document.getElementById('s8-whatsapp').value.trim();
+  if (wa) {
+    status.textContent = 'Demo: Section 8 would export to Excel and be sent to WhatsApp ' + wa + ' — actual export/send not implemented in this mockup.';
+  } else {
+    status.textContent = 'Demo: Section 8 would export to Excel. No WhatsApp number entered — enter one above to also demo the send-via-WhatsApp step.';
+  }
+  status.style.color = 'var(--io-blue-dark)';
+}
+function demoSyncMasterData() {
+  // DEMO only, and deliberately not a real feature to build as-is — see the
+  // recommendation printed on the form itself. A "sync button" implies each form
+  // holds its own copy of master data that can drift out of date between syncs.
+  // The better fix is a shared backend database (already planned, Section 4) so
+  // Rate Master, Stock Master, Monthly Expenses, and Employee Master are read
+  // live by every form that needs them — no syncing, no stale data, ever.
+  var status = document.getElementById('sync-status');
+  status.textContent = 'Demo: in the real system, this button would not exist — Rate Master, Stock Master (Oil Sales), Monthly Expenses, and Employee Master would already be live via the shared database, with nothing to sync.';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function updateFromMonthlyExpensesDemo() {
+  // DEMO only, honestly limited: no shared backend exists between these static
+  // files. CONFIRMED (2026-08-28): Monthly Expenses is the source for Section
+  // 8's Regular Expenses — since every Monthly Expenses row carries its own
+  // date, a real implementation would sum whichever rows match today's date
+  // for the matching categories (Salaries, Power Bill, Unload Beta, Salary
+  // Advances) and populate them here, rather than these being typed
+  // independently as a second record of the same real-world expense.
+  var status = document.getElementById('s8-monthly-pull-status');
+  var today = new Date().toLocaleDateString();
+  status.textContent = 'Demo: would pull today\'s (' + today + ') dated entries from Monthly Expenses for Salaries, Power Bill, Unload Beta, and Salary Advances into the rows above. Real pull needs the shared backend database (BRD Section 4).';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function updateFromDailySalesDemo() {
+  // DEMO only, honestly limited — see the matching button on Daily Sales Entry
+  // (updateTrialBalanceDemo). No live link exists between separate static HTML
+  // files; a real implementation needs the shared backend database (BRD Section 4).
+  // CORRECTED (2026-08-26): pulls from Daily Sales Summary's verified Combined
+  // Summary (Section 3 there), NOT directly from either pump's raw Daily Sales
+  // Entry submission — this section needs both pumps combined and human-verified
+  // first, which is exactly what Daily Sales Summary exists to do (see BRD).
+  var status = document.getElementById('ds-sync-status');
+  status.textContent = 'Demo: would pull the verified Combined Total (both pumps, both fuels) from Daily Sales Summary\'s Section 3 into this section — not directly from either individual pump\'s raw Daily Sales Entry submission, since this section needs both pumps combined and verified first. Real sync needs the shared backend database (BRD Section 4).';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function addOilItemRow() {
+  var itemName = prompt('New oil/lubricant item name (e.g. a new product the station now sells):');
+  if (!itemName || !itemName.trim()) return;
+  var body = document.getElementById('body-oil-extra');
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>' + itemName.trim() + '</td>' +
+    '<td><input class="oilx-qty" oninput="calcAll()"></td>' +
+    '<td><input class="oilx-rate" placeholder="manual — not in Rate Master"></td>' +
+    '<td><input class="oilx-open" placeholder="manual — not in Inventory Tracking"></td>' +
+    '<td><input class="oilx-close" disabled placeholder="auto"></td>' +
+    '<td><input class="oilx-amt" disabled placeholder="auto"></td>';
+  body.appendChild(tr);
+  calcAll();
+}
+function importFromExcel() {
+  // DEMO only — a real import would parse the uploaded .xlsx, populate every field
+  // across Sections 1-11 from it, and (per this confirmed requirement) add more rows
+  // to Section 9's ledger to accommodate the imported date range if it exceeds the
+  // current row count. No file parsing happens in this static mockup.
+  var currentRows = document.getElementById('body-mgr-calc').children.length;
+  addRow('body-mgr-calc', 26, true);
+  var status = document.getElementById('import-status');
+  status.textContent = 'Demo: import would populate Sections 1-11 from the uploaded file, and added 1 new ledger row (now ' + (currentRows + 1) + ') to accommodate it — real parsing not implemented in this mockup.';
+  calcAll();
+}
+
+function ensureMinLedgerRows(minRows) {
+  var body = document.getElementById('body-mgr-calc');
+  var currentRows = body.children.length;
+  for (var i = currentRows; i < minRows; i++) {
+    addRow('body-mgr-calc', 26, true);
+  }
+}
+
+var s3CreditorOpts = ['— select —', 'Anil/Nani New Credit', 'AirTel Hari New Credit', 'Salary Advance Viaj', 'Salary Advance Ashok', 'Salary Advance Sriharsha', 'Salary Advance Ravindra', 'Sajja Function Hall - New Credit'];
+var s3ExpOpts = ['— select —', 'Salaries Mid/End of Month - Total', 'Power Bill', 'Unload Beta', 'Salary Advances Total'];
+var s3RemitOpts = ['— select —', 'Sajja Old Credit Remitted Amt', 'Anil/Nani Old Credit Remitted Amt', 'AirTel Hari Old Credit Remitted Amt', 'AirTel New Credit Remitted Amt'];
+var s8RemitOpts = ['— select —', 'Sajja Old Credit Remitted Amt', 'Anil Old Credit Remitted', 'AirTel Hari Old Credit Remitted', 'AirTel New Credit Remitted'];
+
+function addNewOption(optsArray, selectClasses, promptLabel, statusElId) {
+  var newVal = prompt('Add a new ' + promptLabel + ' (e.g. a new customer/employee name):');
+  if (!newVal || !newVal.trim()) return;
+  newVal = newVal.trim();
+  if (optsArray.indexOf(newVal) !== -1) {
+    alert('"' + newVal + '" is already in the list.');
+    return;
+  }
+  optsArray.push(newVal);
+  // Add to every currently-rendered dropdown across ALL classes sharing this list
+  // (e.g. Section 3 and Section 8's Expense categories are confirmed to share the
+  // SAME underlying Excel validation range — a new category added in either place
+  // must appear in both, not just where it was added) — so the new option is
+  // immediately usable everywhere on the form, not only in rows added after this.
+  var classes = Array.isArray(selectClasses) ? selectClasses : [selectClasses];
+  classes.forEach(function(cls) {
+    var selects = document.getElementsByClassName(cls);
+    for (var i = 0; i < selects.length; i++) {
+      var opt = document.createElement('option');
+      opt.textContent = newVal;
+      selects[i].appendChild(opt);
+    }
+  });
+  var status = document.getElementById(statusElId);
+  if (status) {
+    status.textContent = '"' + newVal + '" added to this list — available in every row on this form, now and going forward.';
+    status.style.color = 'var(--io-blue-dark)';
+  }
+  // DEMO note: in the real system, this list is backend-configurable (could be
+  // sourced from an Excel sheet of approved values, per this session's request) and
+  // the new option would persist for every user, not just this browser session.
+}
+function buildSelect(cls, opts, onChangeFn) {
+  var sel = document.createElement('select');
+  sel.className = cls;
+  if (onChangeFn) sel.onchange = onChangeFn;
+  opts.forEach(function(o, idx) {
+    var opt = document.createElement('option');
+    opt.textContent = o;
+    if (idx === 0) opt.value = '';
+    sel.appendChild(opt);
+  });
+  return sel;
+}
+function addRow3Creditors() {
+  var body = document.getElementById('body-s3-creditors');
+  var tr = document.createElement('tr');
+  var td1 = document.createElement('td'); td1.appendChild(buildSelect('s3-creditor-name', s3CreditorOpts));
+  var td2 = document.createElement('td'); var inp = document.createElement('input'); inp.className = 's3-creditor'; inp.oninput = calcAll; td2.appendChild(inp);
+  tr.appendChild(td1); tr.appendChild(td2);
+  body.appendChild(tr);
+}
+function addRow3Expenses() {
+  var body = document.getElementById('body-s3-expenses');
+  var tr = document.createElement('tr');
+  var td1 = document.createElement('td'); td1.appendChild(buildSelect('s3-exp-category', s3ExpOpts));
+  var td2 = document.createElement('td'); var inp = document.createElement('input'); inp.className = 's3-exp-amount'; inp.oninput = calcAll; td2.appendChild(inp);
+  tr.appendChild(td1); tr.appendChild(td2);
+  body.appendChild(tr);
+}
+function addRow3Remittance() {
+  var body = document.getElementById('body-s3-remittance');
+  var tr = document.createElement('tr');
+  var td1 = document.createElement('td'); td1.appendChild(buildSelect('s3-remit-name', s3RemitOpts));
+  var td2 = document.createElement('td'); td2.innerHTML = '<input type="date">';
+  var td3 = document.createElement('td'); var inp = document.createElement('input'); inp.className = 's3-remit-amt'; inp.oninput = calcAll; td3.appendChild(inp);
+  tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+  body.appendChild(tr);
+}
+function addRow8Expenses() {
+  var body = document.getElementById('body-s8-expenses');
+  var row = document.createElement('div');
+  row.className = 'summary-row';
+  var span1 = document.createElement('span'); span1.appendChild(buildSelect('s8-exp-category', s3ExpOpts, calcAll));
+  var span2 = document.createElement('span'); var inp = document.createElement('input'); inp.className = 's8-exp-amount'; inp.style.width = '120px'; inp.style.textAlign = 'right'; inp.oninput = calcAll; span2.appendChild(inp);
+  row.appendChild(span1); row.appendChild(span2);
+  body.appendChild(row);
+}
+function addRow8Remittance() {
+  var body = document.getElementById('body-s8-remittance');
+  var row = document.createElement('div');
+  row.className = 'summary-row';
+  var span1 = document.createElement('span'); span1.appendChild(buildSelect('s8-remit-name', s8RemitOpts));
+  var span2 = document.createElement('span'); var inp = document.createElement('input'); inp.className = 's8-remit-amt'; inp.style.width = '120px'; inp.style.textAlign = 'right'; inp.oninput = calcAll; span2.appendChild(inp);
+  row.appendChild(span1); row.appendChild(span2);
+  body.appendChild(row);
+}
+function addRow(bodyId, colCount, isDateFirst) {
+  var body = document.getElementById(bodyId);
+  var tr = document.createElement('tr');
+  for (var i = 0; i < colCount; i++) {
+    var td = document.createElement('td');
+    if (bodyId === 'body-s3-creditors' && i === 0) {
+      var sel = document.createElement('select');
+      sel.className = 's3-creditor-name';
+      var opts = ['— select —', 'Anil/Nani New Credit', 'AirTel Hari New Credit', 'Salary Advance Viaj', 'Salary Advance Ashok', 'Salary Advance Sriharsha', 'Salary Advance Ravindra', 'Sajja Function Hall - New Credit'];
+      opts.forEach(function(o, idx) {
+        var opt = document.createElement('option');
+        opt.textContent = o;
+        if (idx === 0) opt.value = '';
+        sel.appendChild(opt);
+      });
+      td.appendChild(sel);
+    } else if (bodyId === 'body-s3-creditors' && i === 1) {
+      var inp = document.createElement('input');
+      inp.className = 's3-creditor';
+      inp.oninput = calcAll;
+      td.appendChild(inp);
+    } else {
+      td.innerHTML = (isDateFirst && i === 0) ? '<input type="date">' : '<input>';
+    }
+    tr.appendChild(td);
+  }
+  body.appendChild(tr);
+}
+function setLang(btn, lang) {
+  document.querySelectorAll('.lang-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.title-text').forEach(function(el){
+    el.textContent = lang === 'te' ? el.getAttribute('data-te') : el.getAttribute('data-en');
+  });
+}
+function setAccent(btn, color) {
+  var map = { red: 'var(--io-red)', blue: 'var(--io-blue)', orange: 'var(--io-orange)' };
+  document.documentElement.style.setProperty('--io-accent', map[color]);
+  document.querySelectorAll('.theme-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+ensureMinLedgerRows(5);
+calcAll();
+</script>
+</body>
+</html>

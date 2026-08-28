@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SVR Indian Oil Service Station - Daily Sales Report</title>
+<style>
+  :root{
+    --io-blue: #0033a0;
+    --io-blue-dark: #00246e;
+    --io-red: #e31e24;
+    --io-orange: #F37022;
+    --io-accent: var(--io-orange);
+    --paper: #ffffff;
+    --ink: #1a1a1a;
+    --line: #c9d6ef;
+    --panel: #ffffff;
+  }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--paper);
+    margin: 0;
+    padding: 24px;
+    color: var(--ink);
+  }
+  .sheet {
+    max-width: 1122px;
+    margin: 0 auto;
+    background: var(--panel);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  .flamebar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--io-red) 0%, var(--io-blue) 100%);
+  }
+  .header {
+    background: var(--io-blue);
+    background: linear-gradient(180deg, var(--io-blue) 0%, var(--io-blue-dark) 100%);
+    color: #fff;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    gap: 16px;
+  }
+  .logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.30);
+    padding: 5px;
+  }
+  .logo-flame {
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 24px solid var(--io-red);
+    border-radius: 40% 40% 50% 50%;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .header p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #d7e0f5;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .lang-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    color: #fff;
+    padding: 5px 11px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .lang-toggle button.active {
+    background: #fff;
+    color: var(--io-blue-dark);
+  }
+  .theme-toggle {
+    display: flex;
+    gap: 5px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 4px 6px;
+  }
+  .theme-toggle button {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+    padding: 0;
+  }
+  .theme-toggle button.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .doc-tag {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .body-pad {
+    padding: 20px 24px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px 16px;
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--io-blue);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 13px;
+    background: #ffffff;
+  }
+  .section-title {
+    background: var(--io-accent);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+    margin-top: 18px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+  }
+  th {
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+    font-size: 11px;
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    font-size: 12px;
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  td input, td select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-size: 12px;
+  }
+  .total-row td {
+    font-weight: 700;
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+  }
+  .total-row input {
+    background: #eef1fa;
+    font-weight: 700;
+  }
+  .summary-box {
+    background: #ffffff;
+    border: 1px solid var(--io-blue);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 14px 16px;
+    margin-top: 18px;
+  }
+  .summary-box h3 {
+    margin: -14px -16px 14px -16px;
+    font-size: 13px;
+    background: var(--io-accent);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px 6px 0 0;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--line);
+    color: var(--ink);
+  }
+  .summary-row.net {
+    font-weight: 700;
+    color: var(--io-red);
+    border-bottom: none;
+    padding-top: 8px;
+    font-size: 13.5px;
+  }
+  .verify-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .add-row-btn {
+    display: block;
+    margin: 6px 0 0 auto;
+    background: #ffffff;
+    color: var(--io-blue);
+    border: 1px solid var(--io-blue);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .add-row-btn:hover {
+    background: #eef1fa;
+    color: var(--io-blue-dark);
+    border-color: var(--io-blue-dark);
+  }
+  .export-bar {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .export-btn {
+    background: var(--io-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .export-btn:hover {
+    background: var(--io-blue-dark);
+  }
+  .export-btn.secondary {
+    background: #ffffff;
+    color: var(--io-blue);
+    border: 1px solid var(--io-blue);
+  }
+  .export-btn.secondary:hover {
+    background: #eef1fa;
+  }
+  @media print {
+    .last-updated-bar { display: none !important; }
+    @page {
+      size: A4 landscape;
+      margin: 8mm;
+    }
+    body {
+      padding: 0;
+      background: #ffffff;
+    }
+    .sheet {
+      max-width: 100%;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+    .add-row-btn, .export-bar {
+      display: none;
+    }
+    .flamebar { height: 3px; }
+    .logo { width: 28px; height: 28px; padding: 2px; }
+    .header { padding: 4px 12px; gap: 6px; }
+    .header h1 { font-size: 13px; }
+    .header p { font-size: 8.5px; }
+    .lang-toggle, .doc-tag, .theme-toggle { display: none; }
+    .body-pad { padding: 4px 10px; }
+    .meta-grid { gap: 2px 10px; margin-bottom: 4px; }
+    .field label { font-size: 8px; margin-bottom: 1px; }
+    .field input, td input, td select { padding: 1px 4px; font-size: 9px; }
+    .section-title { margin-top: 4px; padding: 1px 10px; font-size: 10px; }
+    table th { padding: 1px 5px; font-size: 8px; }
+    table td { padding: 0.5px 5px; font-size: 9px; }
+    .summary-box { padding: 4px 10px; margin-top: 4px; }
+    .summary-box h3 { margin: -4px -10px 4px -10px; padding: 1px 10px; font-size: 10px; }
+    .summary-row { padding: 0.5px 0; font-size: 9px; }
+    .summary-row.net { font-size: 9.5px; padding-top: 2px; }
+    .verify-grid { margin-top: 4px; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="flamebar"></div>
+
+  <div class="header">
+    <div class="logo"><img src="data:image/jpeg;base64,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" alt="Indian Oil logo" style="width:100%;height:100%;object-fit:contain;border-radius:6px"></div>
+    <div>
+      <h1>SVR Indian Oil Service Station</h1>
+      <p>PONNUR &nbsp;•&nbsp; DAILY SALES REPORT — DATA ENTRY</p>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle" role="group" aria-label="Language toggle">
+        <button type="button" class="active" onclick="setLang(this,'en')">English</button>
+        <button type="button" onclick="setLang(this,'te')">తెలుగు</button>
+      </div>
+      <div class="theme-toggle" role="group" aria-label="Color theme">
+        <button type="button" onclick="setAccent(this,'red')" title="Red #e31e24" style="background:#e31e24"></button>
+        <button type="button" onclick="setAccent(this,'blue')" title="Blue #0033a0" style="background:#0033a0"></button>
+        <button type="button" class="active" onclick="setAccent(this,'orange')" title="Orange #F37022 (default)" style="background:#F37022"></button>
+      </div>
+      <div class="doc-tag">Manual Entry Mode</div>
+    </div>
+  </div>
+
+  <div class="last-updated-bar" style="background:#eef1fa;border-bottom:1px solid var(--line);padding:6px 24px;font-size:12px;color:var(--io-blue-dark);display:flex;gap:24px;flex-wrap:wrap">
+    <span>Last Updated By: <b id="last-updated-by">Not yet saved</b></span>
+    <span>Last Updated: <b id="last-updated-time">&mdash;</b></span>
+  </div>
+
+  <div class="body-pad">
+
+    <div class="meta-grid">
+      <div class="field"><label>Logged in as</label>
+        <select id="logged-in-as">
+          <option value="">— select —</option>
+          <option>Gopi (Pump Sales Man)</option>
+          <option>Girish (Pump Sales Man)</option>
+          <option>Manager - Mithendra</option>
+        </select>
+      </div>
+      <div class="field"><label>Dt &amp; Time</label><input type="text" id="dt-time" placeholder="DD-MM-YYYY HH:MM"></div>
+      <div class="field"><label>Name</label><input id="ds-name" disabled placeholder="auto (Logged in as, on Save)"></div>
+      <div class="field"><label>Pump Serial#</label><input type="text" id="pump-location" placeholder="e.g. 12BC4523V-Off or 11CC2012V-Road"></div>
+    </div>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:2px 0 8px">CONFIRMED (2026-08-27): whoever is logged in when Save is pressed is who gets recorded — Name and Mgr Name below auto-fill from "Logged in as," no longer manually typed.</p>
+
+    <div class="section-title">1. <span class="title-text" data-en="Gas Sale(s)" data-te="గ్యాస్ అమ్మకాలు">Gas Sale(s)</span></div>
+    <table>
+      <tr><th>Pump</th><th>Current Reading</th><th>Last Shift Reading</th><th>Cons[Last-Current]</th><th>Rate</th><th>Amount</th><th>IOCL #</th></tr>
+      <tr><td style="white-space:nowrap">Diesel(HS-Nz1)</td><td><input id="hs-current" oninput="calcAll()"></td><td><input id="hs-last" disabled placeholder="auto @ 23:59 IST" title="Auto-carried nightly by a scheduled backend job (Asia/Kolkata timezone) from yesterday's Current Reading. Open questions pending client confirmation: behavior if the app was offline at 23:59, gap days with no reading to carry, and whether post-rollover edits re-sync automatically."></td><td><input id="hs-cons" disabled placeholder="auto"></td><td><input id="hs-rate" disabled value="105.36" title="Default Sell Rate HS, locked. Only changes when a Supervisor/Owner presses 'Push Rate Update' on the Rate Master form — never mid-shift, never editable here."></td><td><input id="hs-amount" disabled placeholder="auto"></td><td><input id="hs-ioclnum" placeholder="IOCL reference #"></td></tr>
+      <tr><td style="white-space:nowrap">Petrol(MS-Nz-2)</td><td><input id="ms-current" oninput="calcAll()"></td><td><input id="ms-last" disabled placeholder="auto @ 23:59 IST" title="Auto-carried nightly by a scheduled backend job (Asia/Kolkata timezone) from yesterday's Current Reading. Open questions pending client confirmation: behavior if the app was offline at 23:59, gap days with no reading to carry, and whether post-rollover edits re-sync automatically."></td><td><input id="ms-cons" disabled placeholder="auto"></td><td><input id="ms-rate" disabled value="117.7" title="Default Sell Rate MS, locked. Only changes when a Supervisor/Owner presses 'Push Rate Update' on the Rate Master form — never mid-shift, never editable here."></td><td><input id="ms-amount" disabled placeholder="auto"></td><td><input id="ms-ioclnum" placeholder="IOCL reference #"></td></tr>
+      <tr class="total-row"><td colspan="5">Total Amt</td><td><input id="gas-total" disabled placeholder="auto"></td><td></td></tr>
+    </table>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">Last Shift Reading auto-carries from yesterday's Current Reading at 23:59 IST. Rate auto-pulls from the Rate Master form's Sell Rate HS / Sell Rate MS (not Buy Rate). Only Current Reading is entered here — Amount recalculates the moment it's typed.</p>
+
+    <div class="section-title">2. <span class="title-text" data-en="Oil Sale(s)" data-te="నూనె అమ్మకాలు">Oil Sale(s)</span></div>
+    <table>
+      <tr><th>Item</th><th>Quantity</th><th>Rate</th><th>Opening Stock</th><th>Closing Stock</th><th>Amount</th></tr>
+      <tr><td>2T/1.20 ML Total#</td><td><input id="oil1-qty" oninput="calcAll()"></td><td><input id="oil1-rate" disabled placeholder="auto (Rate Master)"></td><td><input id="oil1-before" disabled placeholder="auto (Inventory)"></td><td><input id="oil1-after" disabled placeholder="auto"></td><td><input id="oil1-amount" disabled placeholder="auto"></td></tr>
+      <tr><td>2T/2.40 ML Total#</td><td><input id="oil2-qty" oninput="calcAll()"></td><td><input id="oil2-rate" disabled placeholder="auto (Rate Master)"></td><td><input id="oil2-before" disabled placeholder="auto (Inventory)"></td><td><input id="oil2-after" disabled placeholder="auto"></td><td><input id="oil2-amount" disabled placeholder="auto"></td></tr>
+      <tr><td>Acid Water Total 1 Lts</td><td><input id="oil3-qty" oninput="calcAll()"></td><td><input id="oil3-rate" disabled placeholder="auto (Rate Master)"></td><td><input id="oil3-before" disabled placeholder="auto (Inventory)"></td><td><input id="oil3-after" disabled placeholder="auto"></td><td><input id="oil3-amount" disabled placeholder="auto"></td></tr>
+      <tr><td>Acid Water Total 5 Lts</td><td><input id="oil4-qty" oninput="calcAll()"></td><td><input id="oil4-rate" disabled placeholder="auto (Rate Master)"></td><td><input id="oil4-before" disabled placeholder="auto (Inventory)"></td><td><input id="oil4-after" disabled placeholder="auto"></td><td><input id="oil4-amount" disabled placeholder="auto"></td></tr>
+      <tr><td>20/40 Engine Total in Lts</td><td><input id="oil5-qty" oninput="calcAll()"></td><td><input id="oil5-rate" disabled placeholder="auto (Rate Master)"></td><td><input id="oil5-before" disabled placeholder="auto (Inventory)"></td><td><input id="oil5-after" disabled placeholder="auto"></td><td><input id="oil5-amount" disabled placeholder="auto"></td></tr>
+      <tbody id="body-oil-extra"></tbody>
+      <tr class="total-row"><td colspan="5">Total Amt Oil(s)</td><td><input id="oil-total" disabled placeholder="auto"></td></tr>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addOilItemRow()">+ Add Oil Item</button>
+    <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">Rate auto-pulls from the Rate Master form. Opening Stock auto-pulls from Inventory Tracking's current Closing Stock; Closing Stock = Opening Stock − Quantity, and feeds back into Inventory as the new Closing Stock. Only Quantity is entered here.</p>
+    <p style="font-size:11px;color:var(--io-blue-dark);margin:2px 0 0">New items added here have Rate/Opening Stock entered manually (not yet linked to Rate Master/Inventory Tracking, which only know the 5 named items above) — confirm pricing and current stock with the Manager before entering. Included automatically in Total Amt Oil(s), Daily Sales Total, and the Oil Sales subtotal shown on Daily Trial Balance's own "Update from Daily Sales" pull.</p>
+
+    <div class="section-title">3. <span class="title-text" data-en="Expenses" data-te="ఖర్చులు">Expenses</span></div>
+    <table>
+      <tr><th>Description</th><th>Amount</th></tr>
+      <tr><td>Daily Diesel(5L) &amp; Petrol(5L) + Density Testing + Beta = Total Amt</td><td><input id="exp1" oninput="calcAll()"></td></tr>
+      <tr><td>Any Other Expenses</td><td><input id="exp2" oninput="calcAll()"></td></tr>
+      <tr><td>Last Night Cash Hand-off Persons Name-Signature-Amount</td><td><input id="exp3" oninput="calcAll()"></td></tr>
+      <tr class="total-row"><td>Total Amt Expenses</td><td><input id="exp-total" disabled placeholder="auto"></td></tr>
+    </table>
+
+    <div class="section-title">4. <span class="title-text" data-en="Credit Cards Swiping(s)" data-te="క్రెడిట్ కార్డ్ స్వైపింగ్">Credit Cards Swiping(s)</span></div>
+    <table id="tbl-credit-cards">
+      <tr><th>Card Holder / Terminal ID</th><th>Card Type</th><th>Rate</th><th>Transaction/Receipt #</th><th>Amount</th></tr>
+      <tbody id="body-credit-cards">
+      <tr><td><input></td><td><input></td><td><input></td><td><input></td><td><input class="cc-amount" oninput="calcAll()"></td></tr>
+      <tr><td><input></td><td><input></td><td><input></td><td><input></td><td><input class="cc-amount" oninput="calcAll()"></td></tr>
+      </tbody>
+      <tr class="total-row"><td colspan="4">Total Amt Credit Cards</td><td><input id="cc-total" disabled placeholder="auto"></td></tr>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addRow('body-credit-cards',5)">+ Add row</button>
+
+    <div class="section-title">5. <span class="title-text" data-en="Today New Credit(s)" data-te="నేటి కొత్త క్రెడిట్లు">Today New Credit(s)</span></div>
+    <table id="tbl-new-credit">
+      <tr><th>Creditor Name</th><th>Type (1. Diesel 2. Petrol)</th><th>In Ltrs</th><th>Rate</th><th>Amount</th><th>Signature</th></tr>
+      <tbody id="body-new-credit">
+      <tr><td><input></td><td><input></td><td><input class="nc-ltrs" oninput="calcAll()"></td><td><input class="nc-rate" oninput="calcAll()"></td><td><input class="nc-amount" disabled placeholder="auto"></td><td><input></td></tr>
+      <tr><td><input></td><td><input></td><td><input class="nc-ltrs" oninput="calcAll()"></td><td><input class="nc-rate" oninput="calcAll()"></td><td><input class="nc-amount" disabled placeholder="auto"></td><td><input></td></tr>
+      </tbody>
+      <tr class="total-row"><td colspan="5">Total Amt New Credits Today</td><td><input id="nc-total" disabled placeholder="auto"></td></tr>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addRow('body-new-credit',6)">+ Add row</button>
+
+    <div class="section-title">6. <span class="title-text" data-en="Old/Pending Credit Received" data-te="పాత / పెండింగ్ క్రెడిట్ రసీదు">Old/Pending Credit Received</span> <span style="font-weight:400;font-size:11px">[NOT part of today's Daily Sales Report]</span></div>
+    <table id="tbl-old-credit">
+      <tr><th>Customer Name</th><th>Amount</th><th>Old Credit Given Date</th><th>Signature</th></tr>
+      <tbody id="body-old-credit">
+      <tr><td><input></td><td><input class="oc-amount" oninput="calcAll()"></td><td><input></td><td><input></td></tr>
+      <tr><td><input></td><td><input class="oc-amount" oninput="calcAll()"></td><td><input></td><td><input></td></tr>
+      </tbody>
+    </table>
+    <button type="button" class="add-row-btn" onclick="addRow('body-old-credit',4)">+ Add row</button>
+
+    <div class="summary-box">
+      <h3>7. <span class="title-text" data-en="Summary - Cash Hand Off" data-te="సారాంశం — నగదు అప్పగింత">Summary - Cash Hand Off</span></h3>
+      <div class="summary-row"><span>Cash (Gas+ Oils) Total Amt</span><span><input id="sum-cash" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Expenses Total Amt</span><span><input id="sum-expenses" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Phone Pay Settled Total Amt as of 6:30 AM</span><span><input id="sum-pp-settled" oninput="calcAll()" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Phone Pay Not Settled Total Amt As of today ___ AM ( Attach a Separate Empty Sheet if needed)</span><span><input id="sum-pp-unsettled" oninput="calcAll()" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>New Credits Total Amt</span><span><input id="sum-newcredits" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Credit Cards Swiping Total Amt</span><span><input id="sum-cc" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Night Cash Hand Off Total Amt</span><span><input id="sum-nightcash" oninput="calcAll()" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row net"><span>Net Bal Hand off (Cash - Expenses + Phone Pay Not Settled + Today New Credits + Card Swiping + Night Cash Hand Off )</span><span><input id="sum-netbal" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+      <div class="summary-row"><span>Total Amt - Old Credit Amt/Given by Customer Name(Do NOT Include in Today's Total)</span><span><input id="sum-oldcredit" disabled placeholder="auto" style="width:120px;text-align:right"></span></div>
+    </div>
+
+    <div class="export-bar">
+      <button type="button" class="export-btn" onclick="saveFormDemo()" style="order:-1"><i class="ti ti-device-floppy" style="margin-right:6px;font-size:14px"></i>Save</button>
+      <button type="button" class="export-btn secondary" onclick="window.print()"><i class="ti ti-printer" style="margin-right:6px;font-size:14px"></i>Print</button>
+      <button type="button" class="export-btn secondary" onclick="printBlankForm('Road Front')"><i class="ti ti-printer" style="margin-right:6px;font-size:14px"></i>Print Blank Form – 11CC2012V-RDF</button>
+      <button type="button" class="export-btn secondary" onclick="printBlankForm('Office Front')"><i class="ti ti-printer" style="margin-right:6px;font-size:14px"></i>Print Blank Form – 12BC4523V-OFF</button>
+      <button type="button" class="export-btn secondary" onclick="document.getElementById('scan-file-input').click()"><i class="ti ti-camera" style="margin-right:6px;font-size:14px"></i>Scan / Upload (OCR)</button>
+      <input type="file" id="scan-file-input" accept=".jpg,.jpeg,.pdf" style="display:none" onchange="handleScanUpload(this)">
+      <button type="button" class="export-btn secondary"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Import from Excel</button>
+      <button type="button" class="export-btn"><i class="ti ti-file-spreadsheet" style="margin-right:6px;font-size:14px"></i>Export to Excel</button>
+      <button type="button" class="export-btn secondary" onclick="updateTrialBalanceDemo()">Send to Daily Sales Summary</button>
+    </div>
+    <p id="save-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+    <p style="font-size:11px;color:var(--io-blue-dark);text-align:right;margin:2px 0 0">Print, Print Blank Form, Scan/Upload, Import, and Export all apply to Sections 1–7 only</p>
+    <p id="scan-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+    <p id="tb-sync-status" style="font-size:12px;color:var(--io-blue-dark);text-align:right;margin:4px 0 0;min-height:16px"></p>
+
+    <div class="section-title">8. <span class="title-text" data-en="Daily Summary" data-te="రోజువారీ సారాంశం">Daily Summary</span></div>
+    <table>
+      <tr><th>Item</th><th>Total</th></tr>
+      <tr><td>Total HS</td><td><input id="ds-hs" disabled placeholder="auto"></td></tr>
+      <tr><td>Total MS</td><td><input id="ds-ms" disabled placeholder="auto"></td></tr>
+      <tr><td>2T/1.20 ML Total#</td><td><input id="ds-oil1" disabled placeholder="auto"></td></tr>
+      <tr><td>2T/2.40 ML Total#</td><td><input id="ds-oil2" disabled placeholder="auto"></td></tr>
+      <tr><td>Acid Water Total 1 Lts</td><td><input id="ds-oil3" disabled placeholder="auto"></td></tr>
+      <tr><td>Acid Water Total 5 Lts</td><td><input id="ds-oil4" disabled placeholder="auto"></td></tr>
+      <tr><td>20/40 Engine Total in Lts</td><td><input id="ds-oil5" disabled placeholder="auto"></td></tr>
+    </table>
+
+    <div class="verify-grid">
+      <div class="field"><label>Mgr Name</label><input id="mgr-name" disabled placeholder="auto (Logged in as, on Save)"></div>
+      <div class="field"><label>Signature</label><input type="text"></div>
+      <div class="field"><label>Date</label><input type="text"></div>
+    </div>
+
+  </div>
+</div>
+<script>
+function saveFormDemo() {
+  // DEMO only, honestly limited: no backend or database exists in this static
+  // mockup, so there is nowhere real to save to. A real Save would write this
+  // form's data to the shared SQLite backend (BRD Section 4). This button
+  // demonstrates the confirmation UX, not a working save.
+  // CONFIRMED (2026-08-27): whoever is logged in when Save is pressed is who gets
+  // recorded — Name and Mgr Name no longer manually typed, auto-filled here.
+  var status = document.getElementById('save-status');
+  var loggedInAs = document.getElementById('logged-in-as').value;
+  if (!loggedInAs) {
+    status.textContent = 'Select "Logged in as" above before saving — this is who gets recorded against this entry.';
+    status.style.color = 'var(--io-red)';
+    return;
+  }
+  document.getElementById('ds-name').value = loggedInAs;
+  document.getElementById('mgr-name').value = loggedInAs;
+  var now = new Date();
+  var timeStr = now.toLocaleString();
+  document.getElementById('last-updated-by').textContent = loggedInAs;
+  document.getElementById('last-updated-time').textContent = timeStr;
+  status.textContent = 'Demo: entries would be saved to the database as of ' + timeStr + ' by ' + loggedInAs + '. Real persistence requires the backend (BRD Section 4), not implemented in this static mockup.';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function num(id) {
+  var el = document.getElementById(id);
+  if (!el) return 0;
+  return parseAmt(el.value);
+}
+function parseAmt(str) {
+  if (str === undefined || str === null || str === '') return 0;
+  str = String(str).trim();
+  if (str.indexOf('=') !== -1) {
+    // inline sum written as "527+588+100=1215" -> take the part after the last =
+    str = str.substring(str.lastIndexOf('=') + 1).trim();
+  }
+  if (str.indexOf('+') !== -1) {
+    var parts = str.split('+');
+    var sum = 0;
+    for (var i = 0; i < parts.length; i++) {
+      var v = parseFloat(parts[i]);
+      if (!isNaN(v)) sum += v;
+    }
+    return sum;
+  }
+  var n = parseFloat(str);
+  return isNaN(n) ? 0 : n;
+}
+function round4(n) {
+  return Math.round(n * 10000) / 10000;
+}
+function setVal(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.value = round4(val);
+}
+function sumClass(cls) {
+  var els = document.getElementsByClassName(cls);
+  var total = 0;
+  for (var i = 0; i < els.length; i++) total += parseAmt(els[i].value);
+  return total;
+}
+function isBlank(id) {
+  var el = document.getElementById(id);
+  return !el || el.value === undefined || el.value === null || String(el.value).trim() === '';
+}
+function addOilItemRow() {
+  var itemName = prompt('New oil/lubricant item name (e.g. a new product the station now sells):');
+  if (!itemName || !itemName.trim()) return;
+  var body = document.getElementById('body-oil-extra');
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>' + itemName.trim() + '</td>' +
+    '<td><input class="oilx-qty" oninput="calcAll()"></td>' +
+    '<td><input class="oilx-rate" placeholder="manual — not in Rate Master"></td>' +
+    '<td><input class="oilx-open" placeholder="manual — not in Inventory Tracking"></td>' +
+    '<td><input class="oilx-close" disabled placeholder="auto"></td>' +
+    '<td><input class="oilx-amt" disabled placeholder="auto"></td>';
+  body.appendChild(tr);
+  calcAll();
+}
+function calcAll() {
+  // 1. Gas Sale(s) — only compute once Current Reading has been entered;
+  // otherwise leave Cons/Amount blank rather than showing a negative garbage value
+  if (isBlank('hs-current')) {
+    document.getElementById('hs-cons').value = '';
+    document.getElementById('hs-amount').value = '';
+  } else {
+    var hsCons = num('hs-current') - num('hs-last');
+    var hsAmount = hsCons * num('hs-rate');
+    setVal('hs-cons', hsCons);
+    setVal('hs-amount', hsAmount);
+  }
+  if (isBlank('ms-current')) {
+    document.getElementById('ms-cons').value = '';
+    document.getElementById('ms-amount').value = '';
+  } else {
+    var msCons = num('ms-current') - num('ms-last');
+    var msAmount = msCons * num('ms-rate');
+    setVal('ms-cons', msCons);
+    setVal('ms-amount', msAmount);
+  }
+  var gasTotal = num('hs-amount') + num('ms-amount');
+  setVal('gas-total', gasTotal);
+
+  // 2. Oil Sale(s) - 5 rows — only compute Closing Stock/Amount once Quantity is entered;
+  // otherwise Closing Stock mirrors Opening Stock unchanged, and Amount stays blank
+  var oilTotal = 0;
+  for (var i = 1; i <= 5; i++) {
+    var before = num('oil' + i + '-before');
+    if (isBlank('oil' + i + '-qty')) {
+      setVal('oil' + i + '-after', before);
+      document.getElementById('oil' + i + '-amount').value = '';
+    } else {
+      var qty = num('oil' + i + '-qty');
+      var rate = num('oil' + i + '-rate');
+      var amount = qty * rate;
+      setVal('oil' + i + '-after', before - qty);
+      setVal('oil' + i + '-amount', amount);
+      oilTotal += amount;
+    }
+  }
+  // Dynamically-added oil items (via "+ Add Oil Item") — Amount = Qty x Rate,
+  // Closing Stock = Opening Stock - Qty, same logic as the 5 fixed rows above,
+  // but iterated by class since these rows don't have fixed IDs.
+  var extraRows = document.querySelectorAll('#body-oil-extra tr');
+  extraRows.forEach(function(row) {
+    var qtyEl = row.querySelector('.oilx-qty');
+    var rateEl = row.querySelector('.oilx-rate');
+    var openEl = row.querySelector('.oilx-open');
+    var closeEl = row.querySelector('.oilx-close');
+    var amtEl = row.querySelector('.oilx-amt');
+    var open = parseFloat(openEl.value) || 0;
+    if (!qtyEl.value) {
+      closeEl.value = open;
+      amtEl.value = '';
+    } else {
+      var qty = parseFloat(qtyEl.value) || 0;
+      var rate = parseFloat(rateEl.value) || 0;
+      var amount = qty * rate;
+      closeEl.value = round4(open - qty);
+      amtEl.value = round4(amount);
+      oilTotal += amount;
+    }
+  });
+  setVal('oil-total', oilTotal);
+
+  // 3. Expenses
+  var expTotal = num('exp1') + num('exp2') + num('exp3');
+  setVal('exp-total', expTotal);
+
+  // 4. Credit Cards Swiping(s) - dynamic rows via class
+  var ccTotal = sumClass('cc-amount');
+  setVal('cc-total', ccTotal);
+
+  // 5. Today New Credit(s) - dynamic rows, In Ltrs x Rate per row
+  var ncLtrs = document.getElementsByClassName('nc-ltrs');
+  var ncRate = document.getElementsByClassName('nc-rate');
+  var ncAmountEls = document.getElementsByClassName('nc-amount');
+  var ncTotal = 0;
+  for (var j = 0; j < ncAmountEls.length; j++) {
+    var lt = ncLtrs[j] ? parseAmt(ncLtrs[j].value) : 0;
+    var rt = ncRate[j] ? parseAmt(ncRate[j].value) : 0;
+    var amt = lt * rt;
+    ncAmountEls[j].value = round4(amt);
+    ncTotal += amt;
+  }
+  setVal('nc-total', ncTotal);
+
+  // 6. Old/Pending Credit Received - dynamic rows via class
+  var ocTotal = sumClass('oc-amount');
+
+  // 7. Summary - Cash Hand Off
+  setVal('sum-cash', gasTotal + oilTotal);
+  setVal('sum-expenses', expTotal);
+  setVal('sum-newcredits', ncTotal);
+  setVal('sum-cc', ccTotal);
+  var ppUnsettled = num('sum-pp-unsettled');
+  var nightCash = num('sum-nightcash');
+  var netBal = (gasTotal + oilTotal) - expTotal + ppUnsettled + ncTotal + ccTotal + nightCash;
+  setVal('sum-netbal', netBal);
+  setVal('sum-oldcredit', ocTotal);
+
+  // 8. Daily Summary
+  setVal('ds-hs', num('hs-cons'));
+  setVal('ds-ms', num('ms-cons'));
+  setVal('ds-oil1', num('oil1-qty'));
+  setVal('ds-oil2', num('oil2-qty'));
+  setVal('ds-oil3', num('oil3-qty'));
+  setVal('ds-oil4', num('oil4-qty'));
+  setVal('ds-oil5', num('oil5-qty'));
+}
+function updateTrialBalanceDemo() {
+  // DEMO only, honestly limited: separate static HTML files cannot exchange live
+  // data — no shared backend exists in this mockup, and browser storage (localStorage
+  // etc.) is deliberately not used per the artifact restrictions. A real
+  // implementation needs the shared SQLite backend already planned (BRD Section 4).
+  // CORRECTED (2026-08-26): this pushes to the Daily Sales Summary form, NOT directly
+  // to Trial Balance — a single pump's raw submission can't populate Trial Balance's
+  // Section 2 alone, since that section needs BOTH pumps' data combined and verified
+  // first. Daily Sales Summary is the correct intermediate step (see BRD).
+  var status = document.getElementById('tb-sync-status');
+  var hsAmt = document.getElementById('hs-amount').value || '0';
+  var msAmt = document.getElementById('ms-amount').value || '0';
+  var pump = document.getElementById('pump-location').value || '(not set)';
+  status.textContent = 'Demo: would send Pump ' + pump + ' — Diesel Amount ' + hsAmt + ', Petrol Amount ' + msAmt + ' — into Daily Sales Summary as this pump\'s submission. It combines with the other pump\'s submission there, gets verified, then feeds Daily Trial Balance Section 2 — this pump\'s data alone cannot populate Trial Balance directly. Real sync needs the shared backend database (BRD Section 4).';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function handleScanUpload(input) {
+  // REAL: this opens the browser's native OS file picker (input.click() above),
+  // genuinely working — not a placeholder. HONEST LIMITATION: no website can force
+  // a file picker to default to a specific folder for security reasons — this is a
+  // browser/OS restriction, not something any code here can override. In practice,
+  // browsers remember the LAST folder a user picked from, so if the HP LaserJet's
+  // scan output always saves to the same folder, the picker will land there again
+  // after the first manual navigation — but that's OS/browser memory, not something
+  // this page can set. Once selected, the file is tagged with the current Pump
+  // Serial# and Last Shift Reading, per the confirmed requirement that a scanned
+  // document should carry that context. No real OCR runs in this static mockup —
+  // Tesseract processing happens in the real backend (BRD Section 4).
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var serial = document.getElementById('pump-location').value || '(not set — click Print Blank Form first, or enter manually)';
+  var hsLast = document.getElementById('hs-last').value || '(not set)';
+  var msLast = document.getElementById('ms-last').value || '(not set)';
+  var status = document.getElementById('scan-status');
+  status.textContent = 'Selected: ' + file.name + ' — tagged with Pump Serial# ' + serial + ', Last Shift Reading HS ' + hsLast + ' / MS ' + msLast + '. Real OCR processing (Tesseract) happens in the backend, not in this mockup.';
+  status.style.color = 'var(--io-blue-dark)';
+}
+function printBlankForm(location) {
+  // UPDATED (2026-08-23): field now shows the actual pump serial number, per the
+  // confirmed physical hardware (12BC4523V = Office/Off pump, 11CC2012V = Road pump)
+  // — more precise than the earlier generic "Road Front"/"Office Front" text.
+  var serial = (location === 'Road Front') ? '11CC2012V-Road' : '12BC4523V-Off';
+  document.getElementById('pump-location').value = serial;
+
+  // UPDATED (2026-08-25): Dt & Time now auto-fills with the current date/time at the
+  // moment the button is clicked (genuinely the current browser time, not a demo
+  // value) — the actual time the blank form is being printed.
+  var now = new Date();
+  var dd = String(now.getDate()).padStart(2, '0');
+  var mm = String(now.getMonth() + 1).padStart(2, '0');
+  var yyyy = now.getFullYear();
+  var hh = String(now.getHours()).padStart(2, '0');
+  var min = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('dt-time').value = dd + '-' + mm + '-' + yyyy + ' ' + hh + ':' + min;
+
+  // DEMO values only, for illustration — in the real system these come from SQLite
+  // via the backend (Section 5.4.1's auto-carry-forward job / Section 5.10 Inventory),
+  // not hardcoded here. Road Front and Off Front are genuinely different physical pumps,
+  // so their Last Shift Reading differs; Oil Sale(s) Opening Stock is shared station-level
+  // inventory, so it's identical regardless of which pump's form is being printed.
+  if (location === 'Road Front') {
+    setVal('hs-last', 1476461.66);
+    setVal('ms-last', 656105.04);
+  } else {
+    setVal('hs-last', 256348.91);
+    setVal('ms-last', 274804.34);
+  }
+  setVal('oil1-before', 50);
+  setVal('oil2-before', 30);
+  setVal('oil3-before', 20);
+  setVal('oil4-before', 15);
+  setVal('oil5-before', 40);
+
+  // CONFIRMED (2026-08-16): Rate also prints, since the worker has no live system
+  // access while filling the form by hand — same demo-value caveat as above, real
+  // values come from the Rate Master module (Section 5.11), identical on both
+  // print options since rates aren't pump-specific.
+  setVal('hs-rate', 105.36);
+  setVal('ms-rate', 117.70);
+  setVal('oil1-rate', 270);
+  setVal('oil2-rate', 310);
+  setVal('oil3-rate', 90);
+  setVal('oil4-rate', 380);
+  setVal('oil5-rate', 260);
+
+  // Clear the fields the worker must still fill by hand
+  document.getElementById('hs-current').value = '';
+  document.getElementById('ms-current').value = '';
+  for (var i = 1; i <= 5; i++) {
+    document.getElementById('oil' + i + '-qty').value = '';
+  }
+
+  calcAll();
+  window.print();
+}
+function addRow(bodyId, colCount) {
+  var body = document.getElementById(bodyId);
+  var tr = document.createElement('tr');
+  for (var i = 0; i < colCount; i++) {
+    var td = document.createElement('td');
+    var input = document.createElement('input');
+    if (bodyId === 'body-credit-cards' && i === colCount - 1) {
+      input.className = 'cc-amount';
+      input.oninput = calcAll;
+    } else if (bodyId === 'body-new-credit' && i === 2) {
+      input.className = 'nc-ltrs';
+      input.oninput = calcAll;
+    } else if (bodyId === 'body-new-credit' && i === 3) {
+      input.className = 'nc-rate';
+      input.oninput = calcAll;
+    } else if (bodyId === 'body-new-credit' && i === 4) {
+      input.className = 'nc-amount';
+      input.disabled = true;
+      input.placeholder = 'auto';
+    } else if (bodyId === 'body-old-credit' && i === 1) {
+      input.className = 'oc-amount';
+      input.oninput = calcAll;
+    }
+    td.appendChild(input);
+    tr.appendChild(td);
+  }
+  body.appendChild(tr);
+  calcAll();
+}
+function setLang(btn, lang) {
+  document.querySelectorAll('.lang-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('.title-text').forEach(function(el){
+    el.textContent = lang === 'te' ? el.getAttribute('data-te') : el.getAttribute('data-en');
+  });
+}
+function setAccent(btn, color) {
+  // CONFIRMED (2026-08-16): user color preference, limited to the three verified
+  // IOCL colors (red #e31e24, blue #0033a0, orange #F37022 default). Runtime-only
+  // in this static file — no localStorage per artifact restrictions; the real
+  // system persists this per-user via the backend/SQLite (Section 4), not the browser.
+  var map = { red: 'var(--io-red)', blue: 'var(--io-blue)', orange: 'var(--io-orange)' };
+  document.documentElement.style.setProperty('--io-accent', map[color]);
+  document.querySelectorAll('.theme-toggle button').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+// DEMO values only — simulating the Rate Master pull described in Section 5.11/5.4.1.
+// In the real system these come from the Rate Master form's Sell Rate HS / Sell Rate MS
+// via the backend/SQLite, not hardcoded here; there is no live link between these two
+// static HTML files. Seeded so Amount can be demonstrated end-to-end from Current
+// Reading alone, matching the confirmed "only Current Reading is entered" design.
+document.getElementById('hs-rate').value = '105.36';
+document.getElementById('ms-rate').value = '117.70';
+calcAll();
+</script>
+</body>
+</html>

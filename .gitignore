@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.spec
+
+# Node / Electron
+node_modules/
+frontend/dist/
+frontend/out/
+installer/output/
+playwright-report/
+test-results/
+
+# Local data
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+local/
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.log
+
+# Claude Code local settings (per-machine)
+.claude/settings.local.json

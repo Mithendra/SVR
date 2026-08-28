@@ -1,0 +1,28 @@
+{
+  "name": "svr-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SVR Indian Oil Service Station - ElectronJS desktop frontend",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "lint": "eslint .",
+    "test": "playwright test",
+    "dist": "electron-builder --win"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.49.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "eslint": "^9.17.0"
+  },
+  "build": {
+    "extends": null,
+    "appId": "in.svr.iocl.station",
+    "productName": "SVR IOCL Station",
+    "directories": { "output": "../installer/output" },
+    "files": ["src/**/*", "package.json"],
+    "win": { "target": "nsis" }
+  }
+}
