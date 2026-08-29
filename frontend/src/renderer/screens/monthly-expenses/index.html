@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Monthly Expenses</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Monthly Expenses — Payroll &amp; Operational</p>
+        </div>
+        <div class="header-right"><div class="doc-tag">Manager / Owner</div></div>
+      </div>
+      <div class="last-updated-bar"><span>Signed in as: <b id="who">&mdash;</b></span></div>
+
+      <div class="body-pad">
+        <div class="section-title">1. Add Expense
+          <button type="button" class="add-row-btn" style="margin:0 0 0 8px" id="new-cat-btn">+ New Category</button>
+        </div>
+        <table>
+          <tr><th>Date</th><th>Category</th><th>Amount</th><th>Description</th><th></th></tr>
+          <tr>
+            <td><input type="date" id="e-date" /></td>
+            <td><select id="e-category"></select></td>
+            <td><input id="e-amount" /></td>
+            <td><input id="e-desc" placeholder="optional" /></td>
+            <td><button type="button" class="add-row-btn" style="margin:0" id="add-expense">Add</button></td>
+          </tr>
+        </table>
+        <p id="form-status" class="status-line"></p>
+
+        <div class="section-title">2. Filter</div>
+        <table>
+          <tr><th>Start</th><th>End</th><th>Category</th><th></th></tr>
+          <tr>
+            <td><input type="date" id="f-start" /></td>
+            <td><input type="date" id="f-end" /></td>
+            <td><select id="f-category"><option value="">— All —</option></select></td>
+            <td>
+              <button type="button" class="add-row-btn" style="margin:0 4px 0 0" id="apply-filter">Apply</button>
+              <button type="button" class="add-row-btn" style="margin:0" id="clear-filter">Clear</button>
+            </td>
+          </tr>
+        </table>
+        <table style="margin-top:6px">
+          <tr><th>Date</th><th>Category</th><th>Kind</th><th>Description</th><th>Amount</th><th></th></tr>
+          <tbody id="expense-rows"></tbody>
+        </table>
+
+        <div class="summary-box">
+          <h3>3. Summary (filtered range)</h3>
+          <div id="summary-cats"></div>
+          <div class="summary-row"><span>Payroll Subtotal</span><span id="s-payroll">—</span></div>
+          <div class="summary-row"><span>Operational Subtotal</span><span id="s-ops">—</span></div>
+          <div class="summary-row net"><span>Grand Total</span><span id="s-grand">—</span></div>
+        </div>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>
