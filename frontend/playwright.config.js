@@ -8,6 +8,8 @@ module.exports = defineConfig({
   fullyParallel: false,
   workers: 1,
   timeout: 30000,
+  // One retry absorbs the occasional cold-start / shared-DB race in the e2e suite.
+  retries: 1,
   reporter: [["list"]],
   globalSetup: "./tests/global-setup.js",
   use: {

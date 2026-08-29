@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Payment Receipt</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Payment Receipt (Point of Sale)</p>
+        </div>
+        <div class="header-right"><div class="doc-tag">English only</div></div>
+      </div>
+      <div class="last-updated-bar"><span>Signed in as: <b id="who">&mdash;</b></span></div>
+
+      <div class="body-pad">
+        <div class="section-title">1. New Receipt</div>
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Date</td><td><input type="date" id="r-date" /></td></tr>
+          <tr><td>Time</td><td><input type="time" id="r-time" /></td></tr>
+          <tr><td>Pump Serial#</td><td><input id="r-pump" placeholder="12BC4523V-OFF / 11CC2012V-RDF" /></td></tr>
+          <tr><td>Attendant</td><td><input id="r-attendant" /></td></tr>
+          <tr><td>Vehicle No. (optional)</td><td><input id="r-vehicle" /></td></tr>
+          <tr><td>Fuel Type</td><td><select id="r-fuel"><option>Diesel</option><option>Petrol</option></select></td></tr>
+          <tr><td>Liters</td><td><input id="r-liters" /></td></tr>
+          <tr><td>Rate (₹/L)</td><td><input id="r-rate" placeholder="auto (Sell Rate) if blank" /></td></tr>
+          <tr><td>Payment Mode</td><td>
+            <select id="r-mode"><option>Cash</option><option>Card</option><option>UPI</option><option>Credit</option></select>
+          </td></tr>
+          <tr id="row-ref" style="display:none"><td>Reference #</td><td><input id="r-ref" /></td></tr>
+          <tr id="row-card" style="display:none"><td>Card ending</td><td><input id="r-card4" maxlength="4" /></td></tr>
+          <tr class="total-row"><td>Total (preview)</td><td><input id="r-total" disabled placeholder="liters x rate" /></td></tr>
+        </table>
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="issue-btn">Issue Receipt</button>
+        </div>
+        <p id="issue-status" class="status-line"></p>
+
+        <div class="summary-box" id="issued-card" style="display:none">
+          <h3>Receipt <span id="ic-no"></span></h3>
+          <div id="ic-body"></div>
+          <div class="export-bar">
+            <button type="button" class="export-btn secondary" onclick="window.print()">Print Receipt</button>
+          </div>
+        </div>
+
+        <div class="section-title">2. Recent Receipts</div>
+        <table>
+          <tr><th>Receipt #</th><th>Date</th><th>Fuel</th><th>Liters</th><th>Rate</th><th>Total</th><th>Mode</th><th></th></tr>
+          <tbody id="receipt-rows"></tbody>
+        </table>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>
