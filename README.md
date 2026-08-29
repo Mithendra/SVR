@@ -11,18 +11,23 @@ for the load-bearing conventions.
 
 ## Status
 
-**Foundation + 4 of 12 modules built end-to-end** (backend + Electron screen +
+**Foundation + 7 of 12 modules built end-to-end** (backend + Electron screen +
 pytest/Playwright), each following the Daily Sales Entry reference pattern.
+Backend `pytest` **61**; frontend Playwright **21**; `ruff` + `eslint` clean.
 
 | Area | State |
 |---|---|
-| Foundation: migrations, auth/session, RBAC, audit, calc engine, 23:59 IST carry-forward, APScheduler, Windows Services, per-component logging | done — `ruff` clean, `pytest` green |
-| **1. Daily Sales Entry** — per-pump/shift entry, locked Sell rate + carried reading snapshot, calc engine, OCR/Excel stubbed `501` | done |
+| Foundation: migrations, auth/session, RBAC, audit, calc engine, 23:59 IST carry-forward, APScheduler, Windows Services, per-component logging | done |
+| **1. Daily Sales Entry** — per-pump/shift entry, locked Sell rate + carried reading + inventory opening snapshot, calc engine, OCR/Excel stubbed `501` | done |
 | **2. Daily Sales Summary** — combines both pump submissions, per-pump verification, both-verified gate on upload to Trial Balance | done |
 | **3. Rate Master** — Owner-only append-only Buy/Sell rate versioning + change-log; Manager view-only | done |
 | **4. Inventory Tracking** — 5 oil SKUs, restock log, low-stock status; feeds Daily Sales Entry opening stock | done |
+| **5. Manage Users** — user CRUD, role assignment, per-user 2FA toggle, last-Owner guards; reset link stubbed `501` (needs email) | done |
+| **6. Credit / Remittance Master** — credits + remittances in one ledger, grouped Creditor Balance Summary (outstanding, pending first) | done |
+| **7. Monthly Expenses** — payroll + operational ledger, extensible categories, date-range/category filtered reporting + grouped summary | done |
 | CI (`.github/workflows/ci.yml`), installer scaffold (`installer/`) | done — installer packaging is a scaffold; PyInstaller freeze + Tesseract bundling are follow-on |
-| Modules 5–12 (Manage Users, Daily Trial Balance, Credit/Remittance, Monthly Expenses, Employee Master, Payment Receipt, Yearly Sales Report, Password Reset), OCR pipeline, Excel import/export, external-statement reconciliation, 2FA, email | not started (Trial Balance blocked on SDD ADR-1) |
+| **8. Employee Master**, **9. Payment Receipt**, **10. Yearly Sales Report**, **11. Password Reset page**, **12. Daily Trial Balance** | not started — 11 needs email; 12 blocked on SDD ADR-1 (manual columns vs computed rollups) |
+| OCR pipeline, Excel import/export, external-statement reconciliation, 2FA enforcement, email | not started |
 
 ## Layout
 
