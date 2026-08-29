@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SVR Module Spec Book</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap"
+/>
+
+<style>
+  :root {
+    --paper: #fbfcfe;
+    --panel: #ffffff;
+    --panel-2: #f2f5fb;
+    --ink: #16202e;
+    --ink-soft: #3c4a5e;
+    --muted: #5f6f88;
+    --hairline: #d6deec;
+    --hairline-strong: #b9c5db;
+
+    --io-blue: #0033a0;
+    --io-blue-deep: #00246e;
+    --io-orange: #e4691f;
+
+    --ok: #1f7a44;
+    --ok-bg: #e7f3ec;
+    --partial: #a45b09;
+    --partial-bg: #f8efdf;
+    --blocked: #b5341d;
+    --blocked-bg: #f8e6e1;
+
+    --measure: 74ch;
+    --radius: 7px;
+  }
+
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0d1119;
+      --panel: #151b26;
+      --panel-2: #1b2331;
+      --ink: #e7ecf5;
+      --ink-soft: #c4cedf;
+      --muted: #93a1b8;
+      --hairline: #29323f;
+      --hairline-strong: #3a4657;
+
+      --io-blue: #6c9bef;
+      --io-blue-deep: #a9c4f7;
+      --io-orange: #f38a4f;
+
+      --ok: #58c98a;
+      --ok-bg: #16281f;
+      --partial: #e0a252;
+      --partial-bg: #2c2113;
+      --blocked: #ef8368;
+      --blocked-bg: #2e1a15;
+
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0d1119;
+    --panel: #151b26;
+    --panel-2: #1b2331;
+    --ink: #e7ecf5;
+    --ink-soft: #c4cedf;
+    --muted: #93a1b8;
+    --hairline: #29323f;
+    --hairline-strong: #3a4657;
+
+    --io-blue: #6c9bef;
+    --io-blue-deep: #a9c4f7;
+    --io-orange: #f38a4f;
+
+    --ok: #58c98a;
+    --ok-bg: #16281f;
+    --partial: #e0a252;
+    --partial-bg: #2c2113;
+    --blocked: #ef8368;
+    --blocked-bg: #2e1a15;
+
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 28px 120px;
+  }
+
+  code,
+  .mono {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.86em;
+  }
+
+  a {
+    color: var(--io-blue);
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 64px 0 26px;
+    margin-bottom: 8px;
+  }
+
+  .flag {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--io-orange);
+    margin-bottom: 22px;
+  }
+  .flag::before {
+    content: "";
+    width: 26px;
+    height: 3px;
+    background: var(--io-orange);
+  }
+
+  h1.title {
+    font-family: "Fraunces", Georgia, serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-size: clamp(2.3rem, 5.6vw, 3.4rem);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+
+  .standfirst {
+    max-width: var(--measure);
+    font-size: 1.08rem;
+    color: var(--ink-soft);
+    margin: 0 0 24px;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .meta-row b {
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  /* ---------- callout ---------- */
+  .callout {
+    margin: 34px 0 8px;
+    padding: 20px 22px;
+    background: var(--panel-2);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--io-blue);
+    border-radius: var(--radius);
+  }
+  .callout h2 {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--io-blue);
+    margin: 0 0 8px;
+  }
+  .callout p {
+    margin: 0;
+    max-width: var(--measure);
+    color: var(--ink-soft);
+    font-size: 0.96rem;
+  }
+  .callout ol {
+    margin: 10px 0 0;
+    padding-left: 20px;
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+  }
+  .callout li {
+    margin: 3px 0;
+  }
+
+  /* ---------- contents ---------- */
+  .toc {
+    margin: 40px 0 12px;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    padding: 18px 0;
+  }
+  .toc h2 {
+    font-size: 0.76rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 3px 20px;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    font-size: 0.92rem;
+  }
+  .toc li a {
+    text-decoration: none;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 9px;
+    padding: 3px 0;
+  }
+  .toc li a:hover {
+    color: var(--io-blue);
+  }
+  .toc li a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8em;
+    color: var(--io-orange);
+    padding-top: 2px;
+  }
+
+  /* ---------- module card ---------- */
+  .module {
+    border-top: 2px solid var(--ink);
+    padding-top: 22px;
+    margin-top: 54px;
+  }
+
+  .module-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .module-num {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 400;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--io-orange);
+    font-variant-numeric: tabular-nums;
+  }
+  .module-name {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 500;
+    font-size: 1.62rem;
+    letter-spacing: -0.01em;
+    margin: 0;
+    flex: 1;
+    min-width: 240px;
+    text-wrap: balance;
+  }
+
+  .pill {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .pill.ok {
+    color: var(--ok);
+    background: var(--ok-bg);
+  }
+  .pill.partial {
+    color: var(--partial);
+    background: var(--partial-bg);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 214px 1fr;
+    gap: 34px;
+    margin-top: 20px;
+  }
+  @media (max-width: 720px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+
+  .rail {
+    font-size: 0.84rem;
+  }
+  .rail dl {
+    margin: 0;
+    display: grid;
+    gap: 12px;
+  }
+  .rail dt {
+    font-size: 0.68rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .rail dd {
+    margin: 0;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .rail dd.mono {
+    font-size: 0.8rem;
+  }
+
+  .body h4 {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--io-blue);
+    margin: 22px 0 9px;
+  }
+  .body h4:first-child {
+    margin-top: 0;
+  }
+  .body p {
+    margin: 0 0 10px;
+    max-width: var(--measure);
+    color: var(--ink-soft);
+  }
+
+  .sections {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 9px;
+  }
+  .sections > li {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 10px;
+    font-size: 0.93rem;
+  }
+  .sections > li > span:first-child {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    color: var(--io-orange);
+    padding-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .sec-name {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .sec-fields {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .formula {
+    background: var(--panel-2);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 13px 15px;
+    margin: 0;
+    overflow-x: auto;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    white-space: pre;
+  }
+  .formula b {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .files code {
+    background: var(--panel-2);
+    border: 1px solid var(--hairline);
+    border-radius: 5px;
+    padding: 2px 7px;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  @media (max-width: 560px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+  }
+  .split h4 {
+    margin-top: 0;
+  }
+  .split ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+  }
+  .split li {
+    margin: 4px 0;
+  }
+  .split .deferred li {
+    color: var(--partial);
+  }
+
+  .note-block {
+    border-left: 3px solid var(--partial);
+    background: var(--partial-bg);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 15px;
+    margin-top: 14px;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .note-block b {
+    color: var(--partial);
+  }
+
+  /* ---------- appendix ---------- */
+  .appendix {
+    border-top: 2px solid var(--ink);
+    margin-top: 64px;
+    padding-top: 24px;
+  }
+  .appendix h2 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin: 0 0 18px;
+  }
+  .appendix h3 {
+    font-size: 0.76rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--io-blue);
+    margin: 26px 0 8px;
+  }
+  .appendix p {
+    max-width: var(--measure);
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+  }
+
+  table.roles {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-top: 6px;
+  }
+  table.roles th,
+  table.roles td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: top;
+  }
+  table.roles th {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom-color: var(--hairline-strong);
+  }
+  table.roles td:first-child {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  footer {
+    margin-top: 70px;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--io-orange);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  @media print {
+    body {
+      background: #fff;
+      color: #000;
+    }
+    .wrap {
+      max-width: 100%;
+      padding: 0 12mm 0;
+    }
+    .toc,
+    .callout {
+      break-inside: avoid;
+    }
+    .module {
+      break-before: page;
+      border-top-color: #000;
+    }
+    .module:first-of-type {
+      break-before: auto;
+    }
+    .layout,
+    .split {
+      break-inside: avoid;
+    }
+    .appendix {
+      break-before: page;
+    }
+    a {
+      color: #000;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="flag">SVR IOCL Station · Reference</div>
+    <h1 class="title">SVR Module Spec Book</h1>
+    <p class="standfirst">
+      One page per form. What the screen is, the sections and fields on it, the
+      formulas it runs, who may use it, the files that own it, and what is built
+      versus deferred &mdash; so a report of trouble on a form goes straight to the
+      module behind it.
+    </p>
+    <div class="meta-row">
+      <span><b>Modules</b> 12 (+2 retired)</span>
+      <span><b>Source</b> BRD &sect;5 · SDD &sect;5 · 14 branded mockups</span>
+      <span><b>Companion</b> docs/&hellip;/IMPLEMENTATION-MAP.md</span>
+      <span><b>Backend</b> FastAPI · SQLite · <span class="mono">127.0.0.1</span></span>
+    </div>
+  </header>
+
+  <div class="callout">
+    <h2>How to use this</h2>
+    <ol>
+      <li>A user reports something wrong on a form &mdash; find its page below.</li>
+      <li>Open the <b>backend router</b>, the <b>frontend screen</b>, and the
+        <b>tests</b> named in that page.</li>
+      <li>Add a failing test case, fix it, re-run
+        <code>pytest</code> (backend) and <code>npm test</code> (frontend).</li>
+      <li>One module per branch and commit, following the Daily Sales Entry
+        pattern.</li>
+    </ol>
+  </div>
+
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#m1">Daily Sales Entry</a></li>
+      <li><a href="#m2">Daily Sales Summary</a></li>
+      <li><a href="#m3">Rate Master</a></li>
+      <li><a href="#m4">Inventory Tracking</a></li>
+      <li><a href="#m5">Manage Users</a></li>
+      <li><a href="#m6">Credit / Remittance Master</a></li>
+      <li><a href="#m7">Monthly Expenses</a></li>
+      <li><a href="#m8">Employee Master + Payroll Run</a></li>
+      <li><a href="#m9">Payment Receipt</a></li>
+      <li><a href="#m10">Yearly Sales Report</a></li>
+      <li><a href="#m11">Password Reset + Email</a></li>
+      <li><a href="#m12">Daily Trial Balance</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 1 ============ -->
+  <article class="module" id="m1">
+    <div class="module-head">
+      <span class="module-num">01</span>
+      <h2 class="module-name">Daily Sales Entry</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">daily_sales_report_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0002_daily_sales_entry.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales (own submission), Manager, Owner &mdash; delete is Manager / Owner only</dd></div>
+          <div><dt>Skill</dt><dd class="mono">skills/daily-sales-entry/</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>Per-pump, per-shift sales entry &mdash; up to two a day, one per pump.
+          Manual entry is live; Scan / OCR and Excel import share the same record
+          and return <code>501</code> for now.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Gas Sale(s)</span> &mdash; <span class="sec-fields">Pump · Current Reading · Last Shift Reading (auto @ 23:59 IST) · Cons[Last&minus;Current] · Rate (locked Sell Rate HS/MS) · Amount · IOCL&nbsp;#</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Oil Sale(s)</span> &mdash; <span class="sec-fields">5 SKUs + &ldquo;Add Oil Item&rdquo;: Item · Quantity · Rate (auto, Rate Master) · Opening Stock (auto, Inventory) · Closing Stock · Amount</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Expenses</span> &mdash; <span class="sec-fields">Description · Amount (accepts an inline sum, e.g. <code>527+588+100=1215</code>)</span></span></li>
+          <li><span>4</span><span><span class="sec-name">Credit Cards Swiping(s)</span> &mdash; <span class="sec-fields">Card Holder / Terminal ID · Card Type · Rate · Transaction / Receipt&nbsp;# · Amount (rows add)</span></span></li>
+          <li><span>5</span><span><span class="sec-name">Today New Credit(s)</span> &mdash; <span class="sec-fields">Creditor Name · Type · In Ltrs · Rate · Amount · Signature</span></span></li>
+          <li><span>6</span><span><span class="sec-name">Old / Pending Credit Received</span> &mdash; <span class="sec-fields">Customer Name · Amount · Old Credit Given Date · Signature &mdash; not part of today&rsquo;s total</span></span></li>
+          <li><span>7</span><span><span class="sec-name">Summary &mdash; Cash Hand Off</span> &mdash; <span class="sec-fields">Cash · Expenses · Phone Pay Settled / Not Settled · New Credits · Card Swiping · Night Cash · Net Bal Hand Off · Old Credit total</span></span></li>
+          <li><span>8</span><span><span class="sec-name">Daily Summary</span> &mdash; <span class="sec-fields">Total HS · Total MS · the 5 oil quantities (all auto-pulled from &sect;1&ndash;2)</span></span></li>
+        </ol>
+
+        <h4>Key formulas</h4>
+        <pre class="formula"><b>cons</b>   = current &minus; last          <span style="opacity:.7"># blank until Current Reading entered</span>
+<b>amount</b> = cons &times; sell_rate         <span style="opacity:.7"># Sell Rate, never Buy</span>
+oil    amount = qty &times; rate ,  closing = opening &minus; qty
+<b>Net Bal Hand Off</b> = (gas + oil) &minus; expenses + phonePayNotSettled
+                  + newCredits + cardSwiping + nightCash
+round4 = JS Math.round ;  1317.52 &times; 105.36 = 138813.9072  <span style="opacity:.7">(pinned by tests)</span></pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/daily_sales_entry.py</code><code>calc/daily_sales_entry.py</code>
+          <code>calc/amounts.py</code><code>carry_forward.py</code><code>rates.py</code>
+          <code>inventory.py</code><code>screens/daily-sales-entry/</code>
+          <code>lib/calc-mirror.js</code><code>tests/test_daily_sales_entry_api.py</code>
+          <code>tests/test_calc_daily_sales_entry.py</code>
+          <code>tests/daily-sales-entry.spec.js</code>
+        </div>
+
+        <div class="split">
+          <div><h4>Built</h4><ul>
+            <li>Manual entry + live calc engine (backend authoritative)</li>
+            <li>23:59 IST carry-forward, gap-day skip-back, catch-up on startup</li>
+            <li>Sell-rate + carried-reading + inventory-opening snapshot on save</li>
+            <li>Print, Print Blank Form (per pump)</li>
+          </ul></div>
+          <div class="deferred"><h4>Deferred</h4><ul>
+            <li>OCR pipeline (Tesseract) &mdash; <code>/ocr</code> &rarr; 501</li>
+            <li>Excel import / export &mdash; &rarr; 501</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 2 ============ -->
+  <article class="module" id="m2">
+    <div class="module-head">
+      <span class="module-num">02</span>
+      <h2 class="module-name">Daily Sales Summary</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">daily_sales_summary_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0003_daily_sales_summary.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales verify their own pump only · Manager / Owner full</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>The link between the two pump sales men&rsquo;s independent Daily Sales
+          Entry submissions and Daily Trial Balance &sect;3. Combines both once
+          they are in and gates the upload behind a human verification.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Office Pump Submission</span> &mdash; <span class="sec-fields">Pump Sales Man · entry mode · Verified dropdown · verification note · pulled HS / MS amounts + oil total</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Road Pump Submission</span> &mdash; <span class="sec-fields">same shape as &sect;1, for the other pump</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Combined Summary &mdash; Both Pumps</span> &mdash; <span class="sec-fields">Office / Road / Combined per fuel + 5 oils + Grand Total &mdash; auto, feeds Trial Balance &sect;3</span></span></li>
+          <li><span>4</span><span><span class="sec-name">Verification &amp; Upload to Daily Trial Balance</span> &mdash; <span class="sec-fields">Verified By (Manager) · Upload button, blocked until both pumps verified</span></span></li>
+        </ol>
+
+        <h4>Logic</h4>
+        <pre class="formula">combined line = office.amount + road.amount   <span style="opacity:.7"># derived at read time, never stored</span>
+status: <b>draft</b> &rarr; <b>verified</b> (both pumps) &rarr; <b>uploaded</b> (Manager / Owner)
+upload &rarr; 409 unless both submissions present AND both verified</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/daily_sales_summary.py</code><code>summary.py</code>
+          <code>screens/daily-sales-summary/</code>
+          <code>tests/test_daily_sales_summary_api.py</code>
+          <code>tests/daily-sales-summary.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 3 ============ -->
+  <article class="module" id="m3">
+    <div class="module-head">
+      <span class="module-num">03</span>
+      <h2 class="module-name">Rate Master</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">rate_master_branded.html</dd></div>
+          <div><dt>Table</dt><dd class="mono">rate_master (0001_init.sql, seeded)</dd></div>
+          <div><dt>Access</dt><dd>Sales blocked · Manager view-only · Owner edit</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>The Owner-controlled Buy / Sell rates for Diesel (HS), Petrol (MS) and
+          the 5 oil SKUs. Editing appends a new effective-dated row so historical
+          records always resolve the rate that was active when they were created.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Update Rates</span> &mdash; <span class="sec-fields">Item · Current Buy · Current Sell · New Buy · New Sell · Effective Date</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Rate Change History</span> &mdash; <span class="sec-fields">Effective Date · Item · Old Sell · New Sell · Buy · Updated By</span></span></li>
+        </ol>
+
+        <h4>Definitions</h4>
+        <pre class="formula"><b>Buy Rate</b>  = what SVR pays IOCL per litre  (cost basis &mdash; Trial Balance &sect;6)
+<b>Sell Rate</b> = what customers pay at the pump  (Daily Sales Entry, Payment Receipt)
+history &ldquo;Old Sell&rdquo; = previous effective row&rsquo;s sell_rate  (LAG window)</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/rate_master.py</code><code>rates.py</code>
+          <code>screens/rate-master/</code><code>tests/test_rate_master.py</code>
+          <code>tests/rate-master.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 4 ============ -->
+  <article class="module" id="m4">
+    <div class="module-head">
+      <span class="module-num">04</span>
+      <h2 class="module-name">Inventory Tracking</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">inventory_tracking_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0004_inventory.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales no access · Manager / Owner full · reorder level is Owner-only</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>Live stock for the same 5 oil SKUs used system-wide, plus a delivery
+          log. Feeds the Opening Stock column on Daily Sales Entry.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Current Stock Levels</span> &mdash; <span class="sec-fields">Item · Unit · Opening Stock · Received (Today) · Sold (Today) · Closing Stock · Reorder Level · Status</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Restock Entry</span> &mdash; <span class="sec-fields">Date · Item · Quantity Received · Supplier / Invoice Ref · Received By</span></span></li>
+        </ol>
+
+        <h4>Logic</h4>
+        <pre class="formula"><b>closing</b> = opening + received_today &minus; sold_today
+<b>status</b>  = &ldquo;low&rdquo; when closing &le; reorder_level, else &ldquo;ok&rdquo;
+sold_today = live preview, summed from that day&rsquo;s Daily Sales Entry oil qty
+on_hand moves on restock ; the sales decrement folds in at Trial Balance finalize</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/inventory.py</code><code>inventory.py</code>
+          <code>screens/inventory-tracking/</code>
+          <code>tests/test_inventory_api.py</code>
+          <code>tests/inventory-tracking.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 5 ============ -->
+  <article class="module" id="m5">
+    <div class="module-head">
+      <span class="module-num">05</span>
+      <h2 class="module-name">Manage Users</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">manage_users_branded.html</dd></div>
+          <div><dt>Table</dt><dd class="mono">users (0001_init.sql)</dd></div>
+          <div><dt>Access</dt><dd>Manager / Owner only</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>User CRUD, role assignment and a per-user 2FA toggle. New users hold no
+          password &mdash; they set one through the emailed reset link.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Add / Edit User</span> &mdash; <span class="sec-fields">Name · Personal Email · Cell Phone · Login Name (auto: first initial + last name, number on collision) · Role · Status · Two-Factor Authentication (Enabled / Disabled)</span></span></li>
+          <li><span>2</span><span><span class="sec-name">User List</span> &mdash; <span class="sec-fields">Name · Email · Login Name · Role · Status · 2FA · Actions: Edit / Reset Password / Delete</span></span></li>
+        </ol>
+
+        <h4>Guards</h4>
+        <pre class="formula">the last <b>active Owner</b> cannot be deleted, demoted or disabled  &rarr; 409
+a user cannot delete <b>their own</b> account                        &rarr; 409
+password_hash / totp_secret are never returned by any endpoint</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/users.py</code><code>users.py</code>
+          <code>screens/manage-users/</code><code>tests/test_users_api.py</code>
+          <code>tests/manage-users.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 6 ============ -->
+  <article class="module" id="m6">
+    <div class="module-head">
+      <span class="module-num">06</span>
+      <h2 class="module-name">Credit / Remittance Master</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">credit_remittance_master_branded.html</dd></div>
+          <div><dt>Supersedes</dt><dd class="mono">new_credit_entry · record_repayment (retired)</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0005_credit_master.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales blocked · Manager / Owner full</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>One ledger for credits given and repayments received, with a running
+          balance grouped by creditor name. Partial repayments are the norm.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">New Credit</span> &mdash; <span class="sec-fields">Creditor Name · Phone Number · Type · In Ltrs · Rate · Amount (= ltrs &times; rate) · Given By · Date · Signature</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Remittance</span> &mdash; <span class="sec-fields">Creditor Name · Payment Amount · Date · Source · Pump Sales Man Involved · Signature</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Creditor Balance Summary</span> &mdash; <span class="sec-fields">Creditor Name · Phone · Total Credit Given · Total Remitted · Outstanding Balance &mdash; grouped, largest outstanding first</span></span></li>
+        </ol>
+
+        <h4>Logic</h4>
+        <pre class="formula">credit amount = ltrs &times; rate  <span style="opacity:.7"># or an explicit amount</span>
+<b>outstanding</b> = &Sigma; credits &minus; &Sigma; remittances , per creditor_name (spelling must match)</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/credit_master.py</code>
+          <code>screens/credit-remittance-master/</code>
+          <code>tests/test_credit_master_api.py</code>
+          <code>tests/credit-remittance-master.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 7 ============ -->
+  <article class="module" id="m7">
+    <div class="module-head">
+      <span class="module-num">07</span>
+      <h2 class="module-name">Monthly Expenses</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">monthly_expenses_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0006_monthly_expenses.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales no access · Manager / Owner full · adding a category is Owner-only</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>Payroll and operational expense ledger with an extensible category
+          list and date-range / category filtered reporting.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Payroll</span> &mdash; <span class="sec-fields">Date · Category · Description · Amount &mdash; &ldquo;+ New Category&rdquo;</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Operational Expenses</span> &mdash; <span class="sec-fields">same shape &mdash; &ldquo;+ New Category&rdquo;</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Expense &amp; Payroll Date Range Report</span> &mdash; <span class="sec-fields">Start · End · Category filter &rarr; payroll / operational / grand totals</span></span></li>
+          <li><span>4</span><span><span class="sec-name">Monthly Summary</span> &mdash; <span class="sec-fields">Category &middot; Total, then Payroll Subtotal · Operational Subtotal · Grand Total</span></span></li>
+        </ol>
+
+        <h4>Seeded categories</h4>
+        <pre class="formula">payroll     : Bi-weekly Salary, Salary Advances
+operational : Power Bill, Rent, Maintenance, Supplies, Misc</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/expenses.py</code><code>screens/monthly-expenses/</code>
+          <code>tests/test_expenses_api.py</code>
+          <code>tests/monthly-expenses.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 8 ============ -->
+  <article class="module" id="m8">
+    <div class="module-head">
+      <span class="module-num">08</span>
+      <h2 class="module-name">Employee Master + Payroll Run</h2>
+      <span class="pill partial">Partial</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">employee_master_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0007_employee_master.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales blocked · Manager / Owner full (holds sensitive bank data)</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>HR record with encrypted-at-rest bank fields, plus a bi-weekly payroll
+          run whose total feeds Monthly Expenses&rsquo; Bi-weekly Salary category.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Employee Master</span> &mdash; <span class="sec-fields">Name · Designation · Daily Wage · Bank Name · Account Number&dagger; · IFSC Code&dagger; · Bank Branch&dagger; · Status &nbsp;(&dagger; Fernet-encrypted, masked in the list, revealed on Edit)</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Payroll Run</span> &mdash; <span class="sec-fields">per employee: Days Worked · Daily Wage (snapshot) · Gross Salary · Salary Advance Deduction · Net Pay &mdash; plus run totals</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Accidental Insurance (Yearly)</span> &mdash; <span class="sec-fields">not built</span></span></li>
+          <li><span>4</span><span><span class="sec-name">Health Insurance (Yearly)</span> &mdash; <span class="sec-fields">not built</span></span></li>
+          <li><span>5</span><span><span class="sec-name">Annual Premium Summary</span> &mdash; <span class="sec-fields">not built</span></span></li>
+        </ol>
+
+        <h4>Logic</h4>
+        <pre class="formula"><b>gross</b> = days_worked &times; daily_wage
+<b>net</b>   = gross &minus; advance_deduction
+bank fields: encrypt(value) on write ; decrypt only on GET /employees/{id}
+audit_log never carries the plaintext or the ciphertext</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/employees.py (router + payroll_router)</code>
+          <code>core/crypto.py</code><code>screens/employee-master/</code>
+          <code>tests/test_employees_api.py</code>
+          <code>tests/employee-master.spec.js</code>
+        </div>
+
+        <div class="note-block">
+          <b>Deferred:</b> Insurance sections 3&ndash;5 (Accidental, Health, Annual
+          Premium Summary) are not modelled.
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 9 ============ -->
+  <article class="module" id="m9">
+    <div class="module-head">
+      <span class="module-num">09</span>
+      <h2 class="module-name">Payment Receipt</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">payment_receipt_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0008_payment_receipt.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales / Manager / Owner may issue · delete is Manager / Owner only · English only</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>The only per-transaction artifact &mdash; a customer-facing fuel receipt
+          at the point of sale.</p>
+
+        <h4>Fields</h4>
+        <ol class="sections">
+          <li><span>&mdash;</span><span><span class="sec-fields">Date · Time · Pump Serial# · Attendant · Vehicle No. (optional) · Fuel Type (Diesel / Petrol) · Liters · Rate (auto = current Sell Rate for the fuel) · Payment Mode (Cash / Card / UPI / Credit) + Reference# / Card ending</span></span></li>
+        </ol>
+
+        <h4>Logic</h4>
+        <pre class="formula"><b>total</b> = liters &times; rate
+receipt_no = &ldquo;SVR-000123&rdquo;  <span style="opacity:.7"># assigned from the row id after insert</span></pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/receipts.py</code><code>rates.py</code>
+          <code>screens/payment-receipt/</code>
+          <code>tests/test_receipts_api.py</code>
+          <code>tests/payment-receipt.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 10 ============ -->
+  <article class="module" id="m10">
+    <div class="module-head">
+      <span class="module-num">10</span>
+      <h2 class="module-name">Yearly Sales Report</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">yearly_sales_report_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0009_yearly_report.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales no access · Manager view · Owner edits the manual figures</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>Financial-year (Apr 1 &ndash; Mar 31) summary. Revenue, salaries and
+          operational expenses are computed live; stock-value COGS and IOCL
+          commission are entered per year by the Owner. Carries a
+          &ldquo;not tax advice &mdash; route through the CA&rdquo; disclaimer.</p>
+
+        <h4>Form sections</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">Fuel Sales (HS / MS)</span> &mdash; <span class="sec-fields">live from Daily Sales Entry</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Oil / Lubricant Sales</span> &mdash; <span class="sec-fields">live</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Cost of Goods Sold &amp; Gross Profit</span> &mdash; <span class="sec-fields">Opening Stock Value · Purchases · Closing Stock Value (manual, Owner)</span></span></li>
+          <li><span>4</span><span><span class="sec-name">IOCL Commission</span> &mdash; <span class="sec-fields">HS / MS (manual, Owner)</span></span></li>
+          <li><span>5</span><span><span class="sec-name">Salaries</span> &mdash; <span class="sec-fields">live from Payroll Run net</span></span></li>
+          <li><span>6&ndash;7</span><span><span class="sec-name">Repairs · Other Expenses</span> &mdash; <span class="sec-fields">live from Monthly Expenses (operational)</span></span></li>
+          <li><span>8</span><span><span class="sec-name">Summary</span> &mdash; <span class="sec-fields">Net Profit + a by-month breakdown</span></span></li>
+        </ol>
+
+        <h4>Logic</h4>
+        <pre class="formula"><b>COGS</b>         = opening + purchases &minus; closing
+<b>Gross Profit</b> = total_revenue &minus; COGS
+<b>Net Profit</b>   = Gross Profit + total_commission &minus; (salaries + operational_expenses)</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/reports.py</code><code>params.py</code>
+          <code>screens/yearly-sales-report/</code>
+          <code>tests/test_reports_api.py</code>
+          <code>tests/yearly-sales-report.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 11 ============ -->
+  <article class="module" id="m11">
+    <div class="module-head">
+      <span class="module-num">11</span>
+      <h2 class="module-name">Password Reset + Email</h2>
+      <span class="pill ok">Built</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">password_reset_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0010_password_reset.sql</dd></div>
+          <div><dt>Access</dt><dd>Any user (self-service) · Manager / Owner (admin-initiated, from Manage Users)</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>Single-use, time-limited emailed reset link &mdash; both self-service and
+          admin-initiated. The password value is never displayed, stored or
+          transmitted; only the argon2 hash is kept.</p>
+
+        <h4>Flow</h4>
+        <pre class="formula">request(login name <span style="opacity:.7">or</span> email) &rarr; <b>always 202</b>  <span style="opacity:.7"># no account enumeration</span>
+      &rarr; token emailed, valid ~60 min, single use
+&ldquo;Set New Password&rdquo; page: New Password · Confirm · live match check
+confirm(token, new_password) &rarr; min 8 chars ; the user&rsquo;s sessions are cleared
+the Backend Service serves /password-reset.html itself  <span style="opacity:.7"># link opens in a browser</span></pre>
+
+        <h4>Email backends</h4>
+        <pre class="formula">memory  <span style="opacity:.7"># default; dev &mdash; echoes the link in the API response</span>
+file    <span style="opacity:.7"># writes to data_dir/outbox</span>
+smtp    <span style="opacity:.7"># prod &mdash; SVR_SMTP_HOST / _PORT / _USER / _PASSWORD, SVR_APP_BASE_URL</span></pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/auth.py</code><code>api/users.py</code><code>api/pages.py</code>
+          <code>reset.py</code><code>core/email.py</code><code>core/security.py</code>
+          <code>tests/test_password_reset.py</code>
+          <code>tests/password-reset.spec.js</code>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 12 ============ -->
+  <article class="module" id="m12">
+    <div class="module-head">
+      <span class="module-num">12</span>
+      <h2 class="module-name">Daily Trial Balance</h2>
+      <span class="pill partial">Partial</span>
+    </div>
+    <div class="layout">
+      <aside class="rail">
+        <dl>
+          <div><dt>Mockup</dt><dd class="mono">daily_trial_balance_branded.html</dd></div>
+          <div><dt>Migration</dt><dd class="mono">0011_daily_trial_balance.sql</dd></div>
+          <div><dt>Access</dt><dd>Sales blocked · Manager / Owner full · <span class="mono">finalize</span> locks the date</dd></div>
+        </dl>
+      </aside>
+      <div class="body">
+        <h4>Purpose</h4>
+        <p>The most formula-dense module &mdash; an 11-section daily reconciliation.
+          This build models Sections 1, 3, 6 and 7; the rest wait on ADR-1.</p>
+
+        <h4>Form sections (as numbered in the live sheet)</h4>
+        <ol class="sections">
+          <li><span>1</span><span><span class="sec-name">IOCL Computer vs Pump Readings</span> &mdash; <span class="sec-fields">modelled &mdash; Yesterday · Current &rarr; Diff, Consumption (from &sect;3), Computer/Pump Diff, Benefit/Loss, Deduct Testing, Stock Ltrs</span></span></li>
+          <li><span>2</span><span><span class="sec-name">Load / Unload Details</span> &mdash; <span class="sec-fields">manual JSON</span></span></li>
+          <li><span>3</span><span><span class="sec-name">Day Sales Report</span> &mdash; <span class="sec-fields">modelled &mdash; HS / MS consumption pulled read-only from Daily Sales Summary</span></span></li>
+          <li><span>4</span><span><span class="sec-name">Daily Cash &amp; Bank Balances</span> &mdash; <span class="sec-fields">manual JSON</span></span></li>
+          <li><span>5</span><span><span class="sec-name">Cash / Book Value Reconciliation</span> &mdash; <span class="sec-fields">manual JSON &mdash; 5.4 cash/book value feeds &sect;7.1</span></span></li>
+          <li><span>6</span><span><span class="sec-name">Stock Value</span> &mdash; <span class="sec-fields">modelled &mdash; ltrs &times; Buy Rate</span></span></li>
+          <li><span>7</span><span><span class="sec-name">Trial Balance &mdash; Actual Reported</span> &mdash; <span class="sec-fields">modelled &mdash; 7.3 = 7.1 + 7.2</span></span></li>
+          <li><span>8</span><span><span class="sec-name">Trial Balance &mdash; Projected vs Pump</span> &mdash; <span class="sec-fields">manual JSON</span></span></li>
+          <li><span>9</span><span><span class="sec-name">Daily Management Reporting</span> &mdash; <span class="sec-fields">manual JSON</span></span></li>
+          <li><span>10</span><span><span class="sec-name">Daily Mgr Calculation</span> &mdash; <span class="sec-fields">26-column running ledger &mdash; manual JSON</span></span></li>
+          <li><span>11</span><span><span class="sec-name">Old / New Credit Sales Details · Fleet Card</span> &mdash; <span class="sec-fields">manual JSON</span></span></li>
+        </ol>
+
+        <h4>Modelled formulas (SDD &sect;9)</h4>
+        <pre class="formula"><b>&sect;1</b>  diff = yesterday &minus; current
+     consumption = pulled from &sect;3
+     computer/pump diff = consumption &minus; diff
+     benefit/loss       = consumption + diff
+     deduct testing     = consumption &minus; 10        <span style="opacity:.7"># system_parameter</span>
+<b>&sect;6</b>  stock ltrs = diff &minus; consumption           <span style="opacity:.7"># sign PROVISIONAL</span>
+     amount     = ltrs &times; Buy Rate ;  total = HS + MS
+<b>&sect;7</b>  7.1 = today&rsquo;s cash / book value (manual)
+     7.2 = &sect;6 total ;  7.3 = 7.1 + 7.2</pre>
+
+        <h4>Owned by</h4>
+        <div class="files">
+          <code>api/daily_trial_balance.py</code>
+          <code>calc/daily_trial_balance.py</code><code>summary.py</code>
+          <code>rates.py</code><code>params.py</code>
+          <code>screens/daily-trial-balance/</code>
+          <code>tests/test_daily_trial_balance_api.py</code>
+          <code>tests/daily-trial-balance.spec.js</code>
+        </div>
+
+        <div class="note-block">
+          <b>Blocked / provisional:</b> Sections 2, 4, 5, 8, 9, 10, 11 sit in a
+          <code>manual_json</code> blob pending <b>SDD ADR-1</b> &mdash; the client
+          must choose: manual columns, or computed rollups from Credit Master /
+          Monthly Expenses / Payroll Run. The &sect;6 litres sign and the density
+          deduction are transcribed from SDD prose but not yet cross-checked
+          against the AUG11 / AUG12 workbooks.
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ appendix ============ -->
+  <section class="appendix">
+    <h2>Appendix</h2>
+
+    <h3>Roles</h3>
+    <p>Exactly three. Every write is re-checked server-side
+      (<code>core/rbac.require</code>), independent of what the screen shows, then
+      recomputed, persisted and written to <code>audit_log</code>
+      (<code>core/audit.record_write</code>).</p>
+    <table class="roles">
+      <thead>
+        <tr><th>Role</th><th>Reach</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Sales</td><td>Station floor. Daily Sales Entry (own submission) and Payment Receipt only. No access to any other module.</td></tr>
+        <tr><td>Manager</td><td>Broad operations across every module, including delete of a submitted daily form. View-only on Rate Master.</td></tr>
+        <tr><td>Owner</td><td>All Manager rights, plus the exclusive right to edit Rate Master, set the Yearly Report&rsquo;s manual figures, add expense categories and change inventory reorder levels.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Retired forms</h3>
+    <p><code>new_credit_entry_branded.html</code> and
+      <code>record_repayment_branded.html</code> were folded into Module 6
+      (Credit / Remittance Master) &mdash; &sect;1 New Credit and &sect;2 Remittance
+      respectively. The files are kept for historical reference only.</p>
+
+    <h3>Not a numbered module</h3>
+    <p>The Home Page / navigation landing and the Login screen are the app
+      <b>shell</b> &mdash; <code>frontend/src/renderer/index.html</code> +
+      <code>app.js</code> (role-filtered nav) and
+      <code>backend/&hellip;/api/auth.py</code>. A Sales session sees only its two
+      permitted links.</p>
+
+    <h3>Standing conventions (from CLAUDE.md)</h3>
+    <p>Daily Sales Entry gas rows use <b>Sell Rate</b>, Trial Balance Stock Value
+      uses <b>Buy Rate</b>. Last Shift Reading carries forward at 23:59
+      <code>Asia/Kolkata</code>. The backend calc engine is authoritative on every
+      save; the renderer mirror is UX only. Frequently-revised constants live in
+      <code>system_parameter</code>, versioned, not in code.</p>
+  </section>
+
+  <footer>
+    <span>SVR Module Spec Book</span>
+    <span>Print &rarr; Save as PDF for a shareable copy</span>
+  </footer>
+</div>
+
+</body>
+</html>

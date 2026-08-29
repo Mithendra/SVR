@@ -4,6 +4,10 @@
 each branded mockup to a production screen, this file adds the *actual file
 locations* so a problem report about a form goes straight to the code that owns it.
 
+A designed, print-to-PDF companion of the same material — one page per form, with
+sections/fields/formulas — is `module-spec-book.html` in this folder (open in a
+browser, then Print → Save as PDF).
+
 Kept in sync by hand. If you add/rename a module file, update the matching row.
 
 ## How to use this

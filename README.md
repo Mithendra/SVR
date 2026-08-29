@@ -12,6 +12,9 @@ for the load-bearing conventions.
 **[`docs/02-System-Design-Architecture/IMPLEMENTATION-MAP.md`](docs/02-System-Design-Architecture/IMPLEMENTATION-MAP.md)**
 maps each of the 12 forms to its exact module files (router, calc engine,
 migration, screen, tests) — the place to look when a specific form has an issue.
+Its print‑to‑PDF companion is
+[`module-spec-book.html`](docs/02-System-Design-Architecture/module-spec-book.html)
+(one page per form; open in a browser → Print → Save as PDF).
 
 ## Status
 
