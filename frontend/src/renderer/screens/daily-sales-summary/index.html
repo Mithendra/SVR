@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Daily Sales Summary</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Daily Sales Summary — Combine &amp; Verify</p>
+        </div>
+        <div class="header-right">
+          <div class="doc-tag" id="status-tag">draft</div>
+        </div>
+      </div>
+
+      <div class="last-updated-bar">
+        <span>Prepared By: <b id="prepared-by">&mdash;</b></span>
+        <span>Uploaded: <b id="uploaded-at">&mdash;</b></span>
+      </div>
+
+      <div class="body-pad">
+        <p style="font-size:11px;color:var(--io-red);margin:0 0 10px">
+          The link between the two pump sales men's independent Daily Sales Entry submissions and
+          Daily Trial Balance's Section 2. Combines both once they're in; upload is blocked until a
+          human verifies each pump.
+        </p>
+
+        <div class="meta-grid">
+          <div class="field"><label for="shift-date">Shift Date</label><input type="date" id="shift-date" /></div>
+          <div class="field"><label>Grand Total — Both Pumps</label><input id="grand-total" disabled /></div>
+        </div>
+
+        <!-- 1. Office -->
+        <div class="section-title">1. Office Pump Submission</div>
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Pump Serial</td><td><input id="off-serial" disabled /></td></tr>
+          <tr><td>Submitted By / Mode</td><td><input id="off-meta" disabled /></td></tr>
+          <tr><td>Pump Sales Man</td><td><input id="off-salesman" /></td></tr>
+          <tr><td>Diesel (HS) Amount</td><td><input id="off-hs" disabled /></td></tr>
+          <tr><td>Petrol (MS) Amount</td><td><input id="off-ms" disabled /></td></tr>
+          <tr><td>Oil Sale(s) Total</td><td><input id="off-oil" disabled /></td></tr>
+          <tr>
+            <td>Verified</td>
+            <td>
+              <select id="off-verified">
+                <option value="0">Not Yet Verified</option>
+                <option value="1">Verified Correct</option>
+              </select>
+            </td>
+          </tr>
+          <tr><td>Verification Note</td><td><input id="off-note" placeholder="e.g. corrections made" /></td></tr>
+        </table>
+
+        <!-- 2. Road -->
+        <div class="section-title">2. Road Pump Submission</div>
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Pump Serial</td><td><input id="road-serial" disabled /></td></tr>
+          <tr><td>Submitted By / Mode</td><td><input id="road-meta" disabled /></td></tr>
+          <tr><td>Pump Sales Man</td><td><input id="road-salesman" /></td></tr>
+          <tr><td>Diesel (HS) Amount</td><td><input id="road-hs" disabled /></td></tr>
+          <tr><td>Petrol (MS) Amount</td><td><input id="road-ms" disabled /></td></tr>
+          <tr><td>Oil Sale(s) Total</td><td><input id="road-oil" disabled /></td></tr>
+          <tr>
+            <td>Verified</td>
+            <td>
+              <select id="road-verified">
+                <option value="0">Not Yet Verified</option>
+                <option value="1">Verified Correct</option>
+              </select>
+            </td>
+          </tr>
+          <tr><td>Verification Note</td><td><input id="road-note" placeholder="e.g. corrections made" /></td></tr>
+        </table>
+
+        <!-- 3. Combined -->
+        <div class="section-title">3. Combined Summary — Both Pumps</div>
+        <table>
+          <tr><th>Line</th><th>Office</th><th>Road</th><th>Combined</th></tr>
+          <tbody id="combined-rows"></tbody>
+          <tr class="total-row"><td colspan="3">Grand Total — Both Pumps</td><td><input id="comb-grand" disabled /></td></tr>
+        </table>
+        <p style="font-size:12px;color:var(--io-blue-dark);margin:8px 0 0">
+          Auto-computed from each pump's own Daily Sales Entry — this combined row is what feeds
+          Daily Trial Balance Section 2, not either pump's individual submission.
+        </p>
+
+        <!-- 4. Upload -->
+        <div class="section-title">4. Verification &amp; Upload to Daily Trial Balance</div>
+        <p id="gate-status" class="status-line"></p>
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="upload-btn">Upload to Daily Trial Balance</button>
+        </div>
+        <p id="upload-status" class="status-line"></p>
+        <p style="font-size:11px;color:var(--io-red);margin:4px 0 0">
+          Upload is blocked until BOTH pumps show "Verified Correct" — the check that a scanned
+          entry was reviewed by a human before it reaches Trial Balance.
+        </p>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>

@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from svr_backend import __version__
-from svr_backend.api import auth, daily_sales_entry, rate_master
+from svr_backend.api import auth, daily_sales_entry, daily_sales_summary, rate_master
 
 
 def create_app() -> FastAPI:
@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router)
     app.include_router(rate_master.router)
     app.include_router(daily_sales_entry.router)
+    app.include_router(daily_sales_summary.router)
     return app
 
 
