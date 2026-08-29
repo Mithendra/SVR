@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Rate Master</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Rate Master — Buy / Sell Rates</p>
+        </div>
+        <div class="header-right">
+          <div class="doc-tag" id="role-tag">Owner Only</div>
+        </div>
+      </div>
+
+      <div class="last-updated-bar">
+        <span>Signed in as: <b id="who">&mdash;</b></span>
+      </div>
+
+      <div class="body-pad">
+        <div class="meta-grid">
+          <div class="field">
+            <label for="effective-date">Effective Date (new rates)</label>
+            <input type="date" id="effective-date" />
+          </div>
+        </div>
+
+        <div class="section-title">1. Update Rates</div>
+        <table>
+          <tr>
+            <th>Item</th><th>Current Buy</th><th>Current Sell</th>
+            <th>New Buy</th><th>New Sell</th><th>Unit</th>
+          </tr>
+          <tbody id="rate-rows"></tbody>
+        </table>
+        <p style="font-size:12px;color:var(--io-blue-dark);margin:6px 0 0">
+          Buy Rate = what SVR pays IOCL per litre. Sell Rate = what customers pay. Daily Sales
+          Entry's Gas Sale(s) pulls <b>Sell Rate</b> specifically. Updates append a new
+          effective-dated row — historical records keep the rate active when they were created.
+        </p>
+        <p style="font-size:12px;color:var(--io-red);font-weight:700;margin:4px 0 0" id="restriction-note">
+          Only the Owner can edit and push rate updates. Manager can view; Sales has no access.
+        </p>
+
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="push-btn">Push Rate Updates</button>
+        </div>
+        <p id="push-status" class="status-line"></p>
+
+        <div class="section-title">2. Rate Change History</div>
+        <table>
+          <tr><th>Effective Date</th><th>Item</th><th>Old Sell</th><th>New Sell</th><th>Buy</th><th>Updated By</th></tr>
+          <tbody id="history-rows"></tbody>
+        </table>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>

@@ -43,6 +43,17 @@ class RateUpdate(BaseModel):
     effective_date: str | None = None  # defaults to today
 
 
+class RateHistoryRow(BaseModel):
+    id: int
+    effective_date: str
+    item_key: str
+    item_label: str
+    buy_rate: float | None
+    sell_rate: float
+    prev_sell_rate: float | None
+    updated_by: str | None
+
+
 @router.get("/current", response_model=list[RateOut])
 def current_rates(
     _: Principal = Depends(require("Manager", "Owner")),
@@ -60,6 +71,25 @@ def current_rates(
         )
         for r in sorted(rows.values(), key=lambda r: r["id"])
     ]
+
+
+@router.get("/history", response_model=list[RateHistoryRow])
+def rate_history(
+    _: Principal = Depends(require("Manager", "Owner")),
+    conn: sqlite3.Connection = Depends(get_db),
+) -> list[RateHistoryRow]:
+    """Full versioned rate log, newest first, with the prior sell rate per item."""
+    rows = conn.execute(
+        """
+        SELECT id, effective_date, item_key, item_label, buy_rate, sell_rate, updated_by,
+               LAG(sell_rate) OVER (
+                   PARTITION BY item_key ORDER BY effective_date, id
+               ) AS prev_sell_rate
+        FROM rate_master
+        ORDER BY effective_date DESC, id DESC
+        """
+    ).fetchall()
+    return [RateHistoryRow(**dict(r)) for r in rows]
 
 
 @router.put("/", response_model=list[RateOut], status_code=200)

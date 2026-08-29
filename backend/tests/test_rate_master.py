@@ -40,3 +40,24 @@ def test_current_rates_returns_latest_per_item(client, auth_headers):
     rows = client.get("/rate-master/current", headers=auth_headers("Owner")).json()
     ms = next(r for r in rows if r["item_key"] == "MS")
     assert ms["sell_rate"] == 120.0
+
+
+def test_history_shows_prior_rate_and_is_manager_visible(client, auth_headers):
+    assert client.get("/rate-master/history", headers=auth_headers("Sales")).status_code == 403
+
+    seed_hs = next(
+        r for r in client.get("/rate-master/current", headers=auth_headers("Owner")).json()
+        if r["item_key"] == "HS"
+    )["sell_rate"]
+
+    client.put(
+        "/rate-master/",
+        json=[{"item_key": "HS", "sell_rate": 109.0, "effective_date": "2026-09-01"}],
+        headers=auth_headers("Owner"),
+    )
+
+    hist = client.get("/rate-master/history", headers=auth_headers("Manager")).json()
+    newest_hs = next(r for r in hist if r["item_key"] == "HS")
+    assert newest_hs["sell_rate"] == 109.0
+    assert newest_hs["prev_sell_rate"] == seed_hs
+    assert newest_hs["effective_date"] == "2026-09-01"
