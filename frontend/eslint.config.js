@@ -13,7 +13,10 @@ module.exports = [
     files: ["src/main/**/*.js", "eslint.config.js"],
     languageOptions: {
       sourceType: "commonjs",
-      globals: { require: "readonly", module: "writable", process: "readonly", __dirname: "readonly", console: "readonly" },
+      globals: {
+        require: "readonly", module: "writable", process: "readonly", __dirname: "readonly",
+        console: "readonly", setTimeout: "readonly", clearTimeout: "readonly",
+      },
     },
   },
   {

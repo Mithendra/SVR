@@ -1,30 +1,54 @@
 # installer/
 
-Packaging + first-run setup for the SVR IOCL Station desktop app.
+Packaging + first-run setup for the SVR IOCL Station desktop app. The output is a
+single NSIS `.exe` that needs **no Python and no Node** on the target PC.
 
-## What's here now (scaffold)
+## Build
 
-- **electron-builder config** — currently inline in `frontend/package.json` under
-  `build` (NSIS target, output to `installer/output/`). `npm run dist` in
-  `frontend/` produces the `.exe`; CI's `build` job runs it and uploads the
-  artifact.
-- **`first-run.ps1`** — the elevated post-install step: applies DB migrations,
-  creates the per-component log tree, registers the two Windows Services
-  (`SVR-IOCL-Backend`, `SVR-IOCL-Scheduler`) with `Automatic` start, and adds the
-  Electron frontend as a per-user Startup-folder shortcut (SDD §19 item 23 — not a
-  service).
+```powershell
+# from the repo root, after `npm ci` in frontend/
+installer\build-all.ps1
+```
 
-## Follow-on work (not done this session)
+That runs two steps:
 
-1. **Freeze the Python backend** with PyInstaller (one-dir) and bundle it +
-   the SQLite DLL into `extraResources` so the target PC needs no Python.
-2. **Bundle Tesseract OCR** (SDD ADR-6) — folder + `SVR_TESSERACT_PATH` config
-   key; wire it when the OCR phase lands.
-3. Have the NSIS `include`/`installerScript` invoke `first-run.ps1` elevated on
-   install and a matching uninstall script that removes the services.
-4. Validate on a clean Windows VM: both services `Automatic` + `Running` in
-   `services.msc`; `C:\ProgramData\SVR-IOCL\logs\` populated; the Startup shortcut
-   opens the app.
+1. **`backend/packaging/build-backend.ps1`** — PyInstaller one-dir freeze →
+   `backend/packaging/dist/svr-backend/`, containing three console exes that share
+   one runtime (`MERGE` in `svr_backend.spec`):
+
+   | exe | role |
+   |---|---|
+   | `svr-backend.exe` | CLI: `migrate` / `serve` / `scheduler` / `gen-key` |
+   | `svr-backend-service.exe` | `SVR-IOCL-Backend` Windows Service host |
+   | `svr-scheduler-service.exe` | `SVR-IOCL-Scheduler` Windows Service host |
+
+2. **`npm run dist`** (electron-builder, NSIS) — bundles that folder as
+   `resources/backend/` (`extraResources`), ships `first-run.ps1` + `uninstall.ps1`
+   to `<INSTDIR>\installer\` (`extraFiles`), and wires the install/uninstall hooks
+   from `frontend/build/installer.nsh`. Output: `installer/output/SVR-IOCL-Station-Setup-*.exe`.
+
+CI's `build` job (`.github/workflows/ci.yml`) runs the same two steps and uploads
+the `.exe` artifact.
+
+## What the installer does on the target
+
+`perMachine` + assisted (not one-click), so it runs elevated. On install,
+`installer.nsh` → `customInstall` runs **`first-run.ps1`**:
+
+1. Creates the data + per-component log tree under `C:\ProgramData\SVR-IOCL`
+   (SDD 14.3).
+2. Persists `SVR_DATA_DIR` / `SVR_DB_PATH` / `SVR_LOG_DIR` as **machine**
+   environment variables (so the SCM-started services see them), and generates
+   `SVR_FIELD_KEY` (Fernet, SDD 13.3) once if unset.
+3. Applies SQLite migrations (`svr-backend.exe migrate`).
+4. Registers **both Windows Services** `--startup auto` and starts them.
+5. Adds the Electron frontend as a per-user Startup-folder shortcut (SDD 19
+   item 23 — not a service).
+
+On uninstall, `customUnInstall` runs **`uninstall.ps1`**: stops + deletes both
+services and removes the Startup shortcut. It deliberately **keeps
+`C:\ProgramData\SVR-IOCL`** (DB, nightly backups, logs) and the machine env vars
+so a reinstall resumes cleanly.
 
 ## Service model (SDD §7.1 / ADR-2)
 
@@ -35,3 +59,14 @@ Packaging + first-run setup for the SVR IOCL Station desktop app.
 
 SQLite gets no service (a file, opened in-process). Tesseract gets no service (a
 library invoked on demand).
+
+## Still follow-on (not in this packaging pass)
+
+1. **Bundle Tesseract OCR** (SDD ADR-6) — folder + `SVR_TESSERACT_PATH` config
+   key; lands with the OCR module (not started).
+2. **Authenticode code-signing** of the exe + installer, and auto-update.
+3. **Clean-VM validation** — install on a fresh Windows 11 VM: both services
+   `Automatic` + `Running` in `services.msc`; `C:\ProgramData\SVR-IOCL\logs\`
+   populated; `svr.sqlite` migrated; the Startup shortcut opens the app and it
+   reaches the backend; reboot re-launches everything; uninstall removes the
+   services but keeps the data tree.

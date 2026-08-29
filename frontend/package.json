@@ -23,6 +23,20 @@
     "productName": "SVR IOCL Station",
     "directories": { "output": "../installer/output" },
     "files": ["src/**/*", "package.json"],
-    "win": { "target": "nsis" }
+    "extraResources": [
+      { "from": "../backend/packaging/dist/svr-backend", "to": "backend" }
+    ],
+    "extraFiles": [
+      { "from": "../installer/first-run.ps1", "to": "installer/first-run.ps1" },
+      { "from": "../installer/uninstall.ps1", "to": "installer/uninstall.ps1" }
+    ],
+    "win": { "target": "nsis" },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "SVR-IOCL-Station-Setup-${version}.${ext}"
+    }
   }
 }

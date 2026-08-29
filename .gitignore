@@ -9,6 +9,10 @@ venv/
 dist/
 build/
 *.spec
+# ...but these hand-written build inputs are tracked despite the globs above.
+!backend/packaging/svr_backend.spec
+!frontend/build/
+!frontend/build/installer.nsh
 
 # Node / Electron
 node_modules/

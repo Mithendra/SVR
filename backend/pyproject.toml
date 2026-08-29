@@ -29,6 +29,12 @@ dev = [
 win = [
     "pywin32>=306",
 ]
+# Freezing the backend for the installer (packaging/svr_backend.spec). Windows-only
+# in practice; kept separate so day-to-day dev/CI needn't install PyInstaller.
+build = [
+    "pyinstaller>=6.6",
+    "pyinstaller-hooks-contrib>=2024.7",
+]
 
 [project.scripts]
 svr-backend = "svr_backend.cli:run_backend"

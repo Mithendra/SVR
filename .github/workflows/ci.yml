@@ -68,21 +68,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Install backend
-        run: python -m pip install --upgrade pip && pip install -e "backend[dev]"
+      - name: Install backend (with freeze + service extras)
+        run: python -m pip install --upgrade pip && pip install -e "backend[dev,build,win]"
       - name: Backend smoke (console scripts run + fresh DB builds)
         shell: bash
         run: |
           svr-migrate --db "$RUNNER_TEMP/build.sqlite" --seed-demo
           svr-backend --help
           svr-scheduler --help
+      - name: Freeze backend (PyInstaller one-dir -> backend/packaging/dist/svr-backend)
+        shell: pwsh
+        run: ./backend/packaging/build-backend.ps1 -SkipInstall
       - name: Install frontend deps
         working-directory: frontend
         run: npm ci
       - name: Fetch Electron binary
         working-directory: frontend
         run: node node_modules/electron/install.js
-      - name: Package Electron app (electron-builder NSIS)
+      - name: Package Electron app (frozen backend bundled as resources/backend/)
         working-directory: frontend
         run: npm run dist
       - name: Upload installer artifact
@@ -91,6 +94,5 @@ jobs:
           name: svr-iocl-station-installer
           path: installer/output/*.exe
           if-no-files-found: warn
-      # NOTE: freezing the Python backend (PyInstaller one-dir) and bundling it +
-      # SQLite + Tesseract into the NSIS payload is follow-on work - see
-      # installer/README.md. This job currently packages the Electron shell only.
+      # Tesseract OCR bundling (installer/README.md item 2) is still follow-on - it
+      # lands with the OCR module. Authenticode code-signing is not wired here.

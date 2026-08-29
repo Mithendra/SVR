@@ -38,7 +38,7 @@ Module 12 (Daily Trial Balance) ships **partial** — see its row.
 | **10. Yearly Sales Report** — FY (Apr–Mar) summary; revenue/salaries/opex computed live; Owner-entered COGS + IOCL commission; CA disclaimer | done |
 | **11. Password Reset + email** — single-use emailed link (self-service + admin-initiated); backend-served reset page; SMTP/file/memory backends | done |
 | **12. Daily Trial Balance** — **partial.** Sections 1/3/6/7 modelled (SDD §9 formulas; Section 3 pulled read-only from Daily Sales Summary; finalize lock). Sections 2/4/5/8/9/10/11 stored as a `manual_json` blob pending SDD ADR-1. Formula sign of Section 6 litres + density deduction still need a workbook cross-check. | partial |
-| CI (`.github/workflows/ci.yml`), installer scaffold (`installer/`) | done — installer packaging is a scaffold; PyInstaller freeze + Tesseract bundling are follow-on |
+| CI (`.github/workflows/ci.yml`), Windows installer (`installer/`) | done — PyInstaller-frozen backend bundled into the NSIS installer; services registered/started on install, removed on uninstall. Tesseract bundling + code-signing are follow-on |
 | OCR pipeline (Tesseract), Excel import/export, external bank-statement reconciliation, 2FA enforcement, Employee Master insurance sections | not started |
 
 ## Layout
@@ -94,7 +94,11 @@ console-script smoke).
 
 ## Deployment (target PC)
 
-Run the installer as Administrator. `installer/first-run.ps1` applies migrations,
-creates `C:\ProgramData\SVR-IOCL\logs\`, registers `SVR-IOCL-Backend` and
-`SVR-IOCL-Scheduler` (`Automatic`), and adds the frontend as a Startup shortcut.
-See [`installer/README.md`](installer/README.md) for what's still scaffolded.
+Build the installer with `installer\build-all.ps1` (PyInstaller freeze →
+electron-builder NSIS; needs no Python/Node on the target). Run the resulting
+`installer/output/SVR-IOCL-Station-Setup-*.exe` as Administrator: `first-run.ps1`
+applies migrations, creates `C:\ProgramData\SVR-IOCL\` (DB + logs + backups),
+persists `SVR_*` config machine-wide (generating `SVR_FIELD_KEY` once), registers
++ starts `SVR-IOCL-Backend` and `SVR-IOCL-Scheduler` (`Automatic`), and adds the
+frontend as a per-user Startup shortcut. Uninstall removes the services but keeps
+the data tree. See [`installer/README.md`](installer/README.md).

@@ -42,8 +42,10 @@ module per fix, per the Daily Sales Entry reference pattern.
 - `frontend/` — ElectronJS. `src/main/` (main + preload bridge, no Node in the
   renderer), `src/renderer/` (screens ported from the `docs` mockups),
   `tests/` (Playwright: page-mode + one `_electron` smoke).
-- `installer/` — electron-builder + first-run scaffold (registers the two Windows
-  Services, runs migrations, creates the log tree).
+- `installer/` — Windows installer. `build-all.ps1` = PyInstaller freeze of the
+  backend (`backend/packaging/`) + electron-builder NSIS; `first-run.ps1` /
+  `uninstall.ps1` (invoked elevated from `frontend/build/installer.nsh`) register /
+  remove the two Windows Services, run migrations, set machine-wide `SVR_*` config.
 - `skills/` — Agent Skills. `daily-sales-entry/` exists; see TODO below.
 
 ## Open items (SDD §19 — confirm with the client before locking in)
