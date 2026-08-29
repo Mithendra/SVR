@@ -16,6 +16,15 @@ from svr_backend.migrations.runner import migrate
 DEMO_PASSWORD = "test-pass-1234"
 
 
+@pytest.fixture(autouse=True)
+def _clear_email_outbox():
+    from svr_backend.core.email import OUTBOX
+
+    OUTBOX.clear()
+    yield
+    OUTBOX.clear()
+
+
 @pytest.fixture
 def db_path(tmp_path):
     return tmp_path / "test.sqlite"

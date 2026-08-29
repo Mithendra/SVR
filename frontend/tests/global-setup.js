@@ -66,7 +66,14 @@ module.exports = async () => {
   fs.rmSync(WORK_DIR, { recursive: true, force: true });
   fs.mkdirSync(WORK_DIR, { recursive: true });
 
-  const env = { ...process.env, SVR_DB_PATH: DB_PATH, SVR_API_PORT: String(BACKEND_PORT) };
+  const env = {
+    ...process.env,
+    SVR_DB_PATH: DB_PATH,
+    SVR_API_PORT: String(BACKEND_PORT),
+    // the reset link must point at a URL a browser can open - the backend serves
+    // /password-reset.html itself
+    SVR_APP_BASE_URL: `http://127.0.0.1:${BACKEND_PORT}`,
+  };
 
   execFileSync(backendExe("svr-migrate"), ["--seed-demo"], { env, stdio: "inherit" });
 

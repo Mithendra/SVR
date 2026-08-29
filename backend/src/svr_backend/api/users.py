@@ -17,8 +17,10 @@ from pydantic import BaseModel, Field
 
 from svr_backend.core.audit import record_write
 from svr_backend.core.db import transaction
+from svr_backend.core.email import echo_link_in_response
 from svr_backend.core.rbac import get_db, require
 from svr_backend.core.session import Principal
+from svr_backend.reset import issue_token, reset_link, send_reset_email
 from svr_backend.users import (
     count_active_owners,
     derive_login_name,
@@ -156,19 +158,28 @@ def update_user(
     return public_user(_get_or_404(conn, user_id))
 
 
-@router.post("/{user_id}/reset-password", status_code=status.HTTP_501_NOT_IMPLEMENTED)
+@router.post("/{user_id}/reset-password", status_code=status.HTTP_202_ACCEPTED)
 def reset_password(
     user_id: int,
-    _: Principal = Depends(require("Manager", "Owner")),
+    principal: Principal = Depends(require("Manager", "Owner")),
     conn: sqlite3.Connection = Depends(get_db),
-) -> None:
-    _get_or_404(conn, user_id)
-    # Admin-initiated reset: sends the same single-use email link as self-service
-    # (SDD 13.1). Never sets or returns a password. Blocked until email integration.
-    raise HTTPException(
-        status.HTTP_501_NOT_IMPLEMENTED,
-        "Password reset email is not yet available (email integration pending)",
-    )
+) -> dict:
+    """Admin-initiated reset: emails the same single-use link as self-service
+    (SDD 13.1). Covers a brand-new user setting their first password and an
+    existing user's reset. Never sets or returns a password value."""
+    row = _get_or_404(conn, user_id)
+    with transaction(conn):
+        token = issue_token(conn, user_id, created_by=principal.login_name)
+        record_write(
+            conn, table="password_reset_token", record_id=token[:12], action="create",
+            actor=principal.login_name,
+            new={"user_id": user_id, "login_name": row["login_name"], "admin_initiated": True},
+        )
+    send_reset_email(row["email"], token, admin_initiated=True)
+    out = {"detail": f"Password reset link emailed to {row['login_name']}."}
+    if echo_link_in_response():
+        out["dev_reset_link"] = reset_link(token)
+    return out
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

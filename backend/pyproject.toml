@@ -51,6 +51,8 @@ select = ["E", "F", "I", "UP", "B"]
 [tool.ruff.lint.per-file-ignores]
 # Test assertions read better on one line even past the width limit.
 "tests/**" = ["E501"]
+# api/pages.py embeds a self-contained HTML document as a string literal.
+"src/svr_backend/api/pages.py" = ["E501"]
 
 [tool.ruff.lint.flake8-bugbear]
 # FastAPI's dependency-injection idiom: Depends()/Header()/require() in defaults.

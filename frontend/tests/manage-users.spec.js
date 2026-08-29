@@ -18,7 +18,7 @@ test("Sales has no Manage Users nav link", async ({ page }) => {
   await expect(page.locator('#nav-links a[data-module="manage-users"]')).toHaveCount(0);
 });
 
-test("Manager creates a user; login name is derived; reset is stubbed", async ({ page }) => {
+test("Manager creates a user; login name is derived; reset link is emailed", async ({ page }) => {
   await login(page, "mmanager");
   await page.goto(SCREEN);
 
@@ -34,5 +34,5 @@ test("Manager creates a user; login name is derived; reset is stubbed", async ({
   await expect(row).toContainText("Sales");
 
   await row.getByRole("button", { name: "Reset Password" }).click();
-  await expect(page.locator("#form-status")).toContainText("not yet available");
+  await expect(page.locator("#form-status")).toContainText("link emailed");
 });

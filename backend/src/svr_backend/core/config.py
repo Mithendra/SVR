@@ -41,6 +41,22 @@ class Settings(BaseSettings):
     # an insecure dev key is used with a warning when unset.
     field_key: str | None = None
 
+    # Email (SDD 7.6). "memory" (default) collects messages in-process and echoes
+    # the reset link back in the API response for dev; "file" writes them under
+    # data_dir/outbox; "smtp" sends for real via the smtp_* settings.
+    email_backend: str = "memory"
+    email_from: str = "no-reply@svr-iocl.local"
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_starttls: bool = True
+
+    # Password reset links (SDD 13.1). app_base_url is where password-reset.html lives.
+    app_base_url: str = "http://127.0.0.1:8756"
+    reset_token_ttl_minutes: int = 60
+    min_password_length: int = 8
+
     def resolved_db_path(self) -> Path:
         return self.db_path or (self.data_dir / "svr.sqlite")
 

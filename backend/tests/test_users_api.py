@@ -88,6 +88,7 @@ def test_cannot_delete_your_own_account(client, auth_headers, users):
     ).status_code == 409
 
 
-def test_reset_password_is_stubbed(client, auth_headers, users):
+def test_admin_reset_password_emails_a_link(client, auth_headers, users):
     r = client.post(f"/users/{users['Sales']}/reset-password", headers=auth_headers("Manager"))
-    assert r.status_code == 501
+    assert r.status_code == 202
+    assert "dev_reset_link" in r.json()  # full flow covered in test_password_reset.py

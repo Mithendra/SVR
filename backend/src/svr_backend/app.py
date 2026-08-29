@@ -17,6 +17,7 @@ from svr_backend.api import (
     employees,
     expenses,
     inventory,
+    pages,
     rate_master,
     receipts,
     reports,
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
         return {"status": "ok", "version": __version__}
 
     app.include_router(auth.router)
+    app.include_router(pages.router)
     app.include_router(rate_master.router)
     app.include_router(daily_sales_entry.router)
     app.include_router(daily_sales_summary.router)

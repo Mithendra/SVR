@@ -111,13 +111,15 @@ async function save() {
 async function resetPassword(id) {
   const st = $("form-status");
   try {
-    await api.post(`/users/${id}/reset-password`);
+    const out = await api.post(`/users/${id}/reset-password`);
+    st.className = "status-line ok";
+    st.textContent = out.detail || "Password reset link emailed.";
+    if (out.dev_reset_link) {
+      st.textContent += `  (dev link: ${out.dev_reset_link})`;
+    }
   } catch (err) {
-    st.className = "status-line";
-    st.textContent =
-      err.status === 501
-        ? "Password reset email is not yet available."
-        : `Reset failed — ${err.message || err}`;
+    st.className = "status-line err";
+    st.textContent = `Reset failed — ${err.message || err}`;
   }
 }
 
