@@ -4,6 +4,11 @@ Repo-wide guidance for AI-assisted development. The authoritative product spec i
 `docs/02-System-Design-Architecture/` (SDD); the requirement history is
 `docs/01-BRD-Requirement-Gathering/`.
 
+**When a form/screen misbehaves, start at
+`docs/02-System-Design-Architecture/IMPLEMENTATION-MAP.md`** — it maps every form to
+its exact backend router, calc engine, migration, frontend screen, and tests. One
+module per fix, per the Daily Sales Entry reference pattern.
+
 ## Model & workflow
 
 - **Model:** Claude Sonnet 5 (cost-effective) for all AI-assisted work in this repo

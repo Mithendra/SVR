@@ -9,6 +9,10 @@ The full requirement history and the authoritative design live in
 (`docs/02-System-Design-Architecture/`) is the spec; see [`CLAUDE.md`](CLAUDE.md)
 for the load-bearing conventions.
 
+**[`docs/02-System-Design-Architecture/IMPLEMENTATION-MAP.md`](docs/02-System-Design-Architecture/IMPLEMENTATION-MAP.md)**
+maps each of the 12 forms to its exact module files (router, calc engine,
+migration, screen, tests) — the place to look when a specific form has an issue.
+
 ## Status
 
 **Foundation + all 12 modules built end-to-end** (backend + Electron screen +
