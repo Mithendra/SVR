@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Manage Users</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Manage Users</p>
+        </div>
+        <div class="header-right">
+          <div class="doc-tag" id="role-tag">Manager / Owner</div>
+        </div>
+      </div>
+      <div class="last-updated-bar"><span>Signed in as: <b id="who">&mdash;</b></span></div>
+
+      <div class="body-pad">
+        <div class="section-title">1. <span id="form-title">Add User</span></div>
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Name</td><td><input id="u-name" placeholder="Full name" /></td></tr>
+          <tr><td>Personal Email</td><td><input id="u-email" placeholder="name@gmail.com" /></td></tr>
+          <tr><td>Cell Phone Number</td><td><input id="u-phone" placeholder="+91 98765 43210" /></td></tr>
+          <tr><td>Login Name (auto-derived)</td><td><input id="u-login" disabled placeholder="e.g. psharma" /></td></tr>
+          <tr>
+            <td>Role</td>
+            <td>
+              <select id="u-role">
+                <option>Sales</option><option>Manager</option><option>Owner</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Status</td>
+            <td><select id="u-status"><option>Active</option><option>Disabled</option></select></td>
+          </tr>
+          <tr>
+            <td>Two-Factor Authentication</td>
+            <td><select id="u-totp"><option value="0">Disabled</option><option value="1">Enabled</option></select></td>
+          </tr>
+        </table>
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="save-btn">Save User</button>
+          <button type="button" class="export-btn secondary" id="reset-pw-btn">Send Password Reset Email</button>
+          <button type="button" class="export-btn secondary" id="cancel-edit-btn" style="display:none">Cancel Edit</button>
+        </div>
+        <p id="form-status" class="status-line"></p>
+
+        <div class="section-title">2. User List</div>
+        <table>
+          <tr><th>Name</th><th>Email</th><th>Login Name</th><th>Role</th><th>Status</th><th>2FA</th><th>Actions</th></tr>
+          <tbody id="user-rows"></tbody>
+        </table>
+        <p style="font-size:11px;color:var(--io-blue-dark);margin:6px 0 0">
+          Login Name = first initial + last name, auto-derived (a number is appended on collision).
+          New users have no password — they set one via the emailed reset link (Section 5.1 / 5.3).
+        </p>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>
