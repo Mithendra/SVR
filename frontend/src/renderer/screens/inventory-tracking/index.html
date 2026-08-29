@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Inventory Tracking</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Oil's Stock — Inventory Tracking</p>
+        </div>
+        <div class="header-right">
+          <div class="doc-tag" id="role-tag">Manager / Owner</div>
+        </div>
+      </div>
+
+      <div class="last-updated-bar">
+        <span>Signed in as: <b id="who">&mdash;</b></span>
+        <span>As of: <b id="as-of-label">&mdash;</b></span>
+      </div>
+
+      <div class="body-pad">
+        <div class="meta-grid">
+          <div class="field"><label for="as-of">As of date</label><input type="date" id="as-of" /></div>
+        </div>
+
+        <div class="section-title">1. Current Stock Levels</div>
+        <table>
+          <tr>
+            <th>Item</th><th>Unit</th><th>Opening</th><th>Received (Today)</th>
+            <th>Sold (Today)</th><th>Closing</th><th>Reorder Level</th><th>Status</th>
+          </tr>
+          <tbody id="stock-rows"></tbody>
+        </table>
+        <p style="font-size:12px;color:var(--io-blue-dark);margin:6px 0 0">
+          Closing Stock = Opening + Received &minus; Sold. Sold (Today) is a live preview from that
+          day's Daily Sales Entry rows; the stock decrement is applied at Daily Trial Balance
+          finalization. Status shows "Low" once Closing falls to or below the Reorder Level.
+        </p>
+
+        <div class="section-title">2. Restock Entry</div>
+        <table>
+          <tr><th>Date</th><th>Item</th><th>Quantity Received</th><th>Supplier / Invoice Ref</th></tr>
+          <tr>
+            <td><input type="date" id="rs-date" /></td>
+            <td><select id="rs-item"></select></td>
+            <td><input id="rs-qty" placeholder="quantity" /></td>
+            <td><input id="rs-ref" placeholder="e.g. INV-1234" /></td>
+          </tr>
+        </table>
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="restock-btn">Add Restock</button>
+        </div>
+        <p id="restock-status" class="status-line"></p>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>

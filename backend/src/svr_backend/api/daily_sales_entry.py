@@ -23,6 +23,7 @@ from svr_backend.core.audit import record_write
 from svr_backend.core.db import transaction
 from svr_backend.core.rbac import get_db, get_principal, require
 from svr_backend.core.session import Principal
+from svr_backend.inventory import on_hand_map
 from svr_backend.rates import latest_effective_rates
 
 router = APIRouter(prefix="/daily-sales-entry", tags=["daily-sales-entry"])
@@ -81,6 +82,7 @@ class PrefillOut(BaseModel):
     sell_rate_hs: float | None
     sell_rate_ms: float | None
     oil_rates: dict[str, float | None]
+    oil_openings: dict[str, float | None]
     oil_labels: dict[str, str]
 
 
@@ -120,6 +122,7 @@ def _apply_locked_context(
     hs_rate = rates["HS"]["sell_rate"] if "HS" in rates else None
     ms_rate = rates["MS"]["sell_rate"] if "MS" in rates else None
     oil_rates = {k: (rates[k]["sell_rate"] if k in rates else None) for k in OIL_KEYS}
+    oil_openings = on_hand_map(conn)  # Opening Stock pulled from Inventory Tracking
 
     carried = carried_last_readings(conn, pump_serial, shift_date)
 
@@ -140,7 +143,7 @@ def _apply_locked_context(
                 "label": OIL_LABELS[key],
                 "qty": src.get("qty"),
                 "rate": oil_rates[key],
-                "opening": src.get("opening"),  # Inventory pull deferred; 0/None for now
+                "opening": oil_openings.get(key),  # backend-owned, from Inventory Tracking
             }
         )
     # keep any operator-added extra rows as-is (manual rate/opening)
@@ -151,6 +154,7 @@ def _apply_locked_context(
         "sell_rate_hs": hs_rate,
         "sell_rate_ms": ms_rate,
         "oil_rates": oil_rates,
+        "oil_openings": oil_openings,
         "carried_from": carried.source_date,
     }
     return payload, meta
@@ -183,6 +187,7 @@ def prefill(
         sell_rate_hs=meta["sell_rate_hs"],
         sell_rate_ms=meta["sell_rate_ms"],
         oil_rates=meta["oil_rates"],
+        oil_openings=meta["oil_openings"],
         oil_labels=dict(OIL_LABELS),
     )
 

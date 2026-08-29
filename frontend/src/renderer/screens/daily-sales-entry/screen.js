@@ -161,6 +161,7 @@ async function loadPrefill() {
   setVal("hs-rate", p.sell_rate_hs);
   setVal("ms-rate", p.sell_rate_ms);
   OIL_KEYS.forEach((k) => setVal(`${k}-rate`, p.oil_rates ? p.oil_rates[k] : ""));
+  OIL_KEYS.forEach((k) => setVal(`${k}-opening`, p.oil_openings ? p.oil_openings[k] : ""));
 
   $("carried-note").textContent = p.carried_from
     ? `Last Shift Reading carried from ${p.carried_from} (auto @ 23:59 IST).`
