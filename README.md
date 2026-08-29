@@ -11,16 +11,18 @@ for the load-bearing conventions.
 
 ## Status
 
-**Foundation + the Daily Sales Entry module, built end-to-end** as the reference
-pattern for the remaining 11 modules.
+**Foundation + 4 of 12 modules built end-to-end** (backend + Electron screen +
+pytest/Playwright), each following the Daily Sales Entry reference pattern.
 
 | Area | State |
 |---|---|
-| Backend: migrations, auth/session, RBAC, audit, calc engine, Rate Master, Daily Sales Entry API, 23:59 IST carry-forward, APScheduler | done — `ruff` clean, `pytest` green |
-| Frontend: Electron shell + Daily Sales Entry screen (ported from the branded mockup), loopback API wiring, theme/language toggles | done — `eslint` clean, Playwright green (page-mode + `_electron` smoke) |
-| Windows Services (pywin32 hosts), per-component logging | done |
+| Foundation: migrations, auth/session, RBAC, audit, calc engine, 23:59 IST carry-forward, APScheduler, Windows Services, per-component logging | done — `ruff` clean, `pytest` green |
+| **1. Daily Sales Entry** — per-pump/shift entry, locked Sell rate + carried reading snapshot, calc engine, OCR/Excel stubbed `501` | done |
+| **2. Daily Sales Summary** — combines both pump submissions, per-pump verification, both-verified gate on upload to Trial Balance | done |
+| **3. Rate Master** — Owner-only append-only Buy/Sell rate versioning + change-log; Manager view-only | done |
+| **4. Inventory Tracking** — 5 oil SKUs, restock log, low-stock status; feeds Daily Sales Entry opening stock | done |
 | CI (`.github/workflows/ci.yml`), installer scaffold (`installer/`) | done — installer packaging is a scaffold; PyInstaller freeze + Tesseract bundling are follow-on |
-| OCR pipeline, Excel import/export, external-statement reconciliation, 2FA, email, modules 2–12 | not started (endpoints stubbed `501` where relevant) |
+| Modules 5–12 (Manage Users, Daily Trial Balance, Credit/Remittance, Monthly Expenses, Employee Master, Payment Receipt, Yearly Sales Report, Password Reset), OCR pipeline, Excel import/export, external-statement reconciliation, 2FA, email | not started (Trial Balance blocked on SDD ADR-1) |
 
 ## Layout
 
