@@ -9,6 +9,7 @@ const MODULES = [
   { key: "rate-master", label: "Rate Master", href: "screens/rate-master/index.html", roles: ["Manager", "Owner"] },
   { key: "inventory-tracking", label: "Inventory Tracking", href: "screens/inventory-tracking/index.html", roles: ["Manager", "Owner"] },
   { key: "manage-users", label: "Manage Users", href: "screens/manage-users/index.html", roles: ["Manager", "Owner"] },
+  { key: "credit-remittance-master", label: "Credit / Remittance Master", href: "screens/credit-remittance-master/index.html", roles: ["Manager", "Owner"] },
   { key: "daily-trial-balance", label: "Daily Trial Balance", href: "#", roles: ["Manager", "Owner"], todo: true },
 ];
 

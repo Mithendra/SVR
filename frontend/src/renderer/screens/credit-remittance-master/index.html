@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Credit / Remittance Master</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Credit / Remittance Master</p>
+        </div>
+        <div class="header-right"><div class="doc-tag">Manager / Owner</div></div>
+      </div>
+      <div class="last-updated-bar"><span>Signed in as: <b id="who">&mdash;</b></span></div>
+
+      <div class="body-pad">
+        <p style="font-size:11px;color:var(--io-red);margin:0 0 10px">
+          Consolidated master record for credits given and repayments received — supersedes the
+          retired New Credit Entry and Record Repayment forms (BRD 5.17). Partial repayments are
+          normal; the Balance Summary groups by Creditor Name (spelling must match).
+        </p>
+
+        <div class="section-title">1. New Credit</div>
+        <table>
+          <tr><th>Creditor Name</th><th>Phone</th><th>Type</th><th>In Ltrs</th><th>Rate</th><th>Amount</th><th></th></tr>
+          <tr>
+            <td><input id="c-name" /></td>
+            <td><input id="c-phone" /></td>
+            <td><input id="c-type" placeholder="Diesel / Petrol" /></td>
+            <td><input id="c-ltrs" /></td>
+            <td><input id="c-rate" /></td>
+            <td><input id="c-amount" disabled placeholder="ltrs x rate" /></td>
+            <td><button type="button" class="add-row-btn" style="margin:0" id="add-credit">Add Credit</button></td>
+          </tr>
+        </table>
+        <table style="margin-top:6px">
+          <tr><th>Date</th><th>Creditor</th><th>Type</th><th>Ltrs</th><th>Rate</th><th>Amount</th><th></th></tr>
+          <tbody id="credit-rows"></tbody>
+        </table>
+
+        <div class="section-title">2. Remittance</div>
+        <table>
+          <tr><th>Creditor Name</th><th>Payment Amount</th><th>Date</th><th>Source</th><th>Pump Sales Man</th><th></th></tr>
+          <tr>
+            <td><input id="r-name" /></td>
+            <td><input id="r-amount" /></td>
+            <td><input type="date" id="r-date" /></td>
+            <td><input id="r-source" placeholder="cash / DSE / TB" /></td>
+            <td><input id="r-psm" /></td>
+            <td><button type="button" class="add-row-btn" style="margin:0" id="add-remittance">Add Remittance</button></td>
+          </tr>
+        </table>
+        <table style="margin-top:6px">
+          <tr><th>Date</th><th>Creditor</th><th>Amount</th><th>Source</th><th></th></tr>
+          <tbody id="remittance-rows"></tbody>
+        </table>
+        <p id="txn-status" class="status-line"></p>
+
+        <div class="section-title">3. Creditor Balance Summary</div>
+        <table>
+          <tr><th>Creditor Name</th><th>Phone</th><th>Total Credit Given</th><th>Total Remitted</th><th>Outstanding Balance</th></tr>
+          <tbody id="summary-rows"></tbody>
+        </table>
+        <p style="font-size:12px;color:var(--io-blue-dark);margin:6px 0 0">
+          Auto-computed. Outstanding = Total Credit Given &minus; Total Remitted, grouped by name,
+          pending balances first.
+        </p>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>

@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from svr_backend import __version__
 from svr_backend.api import (
     auth,
+    credit_master,
     daily_sales_entry,
     daily_sales_summary,
     inventory,
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(daily_sales_summary.router)
     app.include_router(inventory.router)
     app.include_router(users.router)
+    app.include_router(credit_master.router)
     return app
 
 
