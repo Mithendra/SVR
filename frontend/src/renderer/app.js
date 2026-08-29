@@ -14,7 +14,7 @@ const MODULES = [
   { key: "employee-master", label: "Employee Master", href: "screens/employee-master/index.html", roles: ["Manager", "Owner"] },
   { key: "payment-receipt", label: "Payment Receipt", href: "screens/payment-receipt/index.html", roles: ["Sales", "Manager", "Owner"] },
   { key: "yearly-sales-report", label: "Yearly Sales Report", href: "screens/yearly-sales-report/index.html", roles: ["Manager", "Owner"] },
-  { key: "daily-trial-balance", label: "Daily Trial Balance", href: "#", roles: ["Manager", "Owner"], todo: true },
+  { key: "daily-trial-balance", label: "Daily Trial Balance", href: "screens/daily-trial-balance/index.html", roles: ["Manager", "Owner"] },
 ];
 
 const loginView = document.getElementById("login-view");

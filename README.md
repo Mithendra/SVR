@@ -11,9 +11,10 @@ for the load-bearing conventions.
 
 ## Status
 
-**Foundation + 11 of 12 modules built end-to-end** (backend + Electron screen +
+**Foundation + all 12 modules built end-to-end** (backend + Electron screen +
 pytest/Playwright), each following the Daily Sales Entry reference pattern.
-Backend `pytest` **81**; frontend Playwright **30**; `ruff` + `eslint` clean.
+Backend `pytest` **87**; frontend Playwright **32**; `ruff` + `eslint` clean.
+Module 12 (Daily Trial Balance) ships **partial** — see its row.
 
 | Area | State |
 |---|---|
@@ -29,9 +30,9 @@ Backend `pytest` **81**; frontend Playwright **30**; `ruff` + `eslint` clean.
 | **9. Payment Receipt** — point-of-sale fuel receipt; rate defaults from Rate Master; Sales may issue, Manager/Owner may delete | done |
 | **10. Yearly Sales Report** — FY (Apr–Mar) summary; revenue/salaries/opex computed live; Owner-entered COGS + IOCL commission; CA disclaimer | done |
 | **11. Password Reset + email** — single-use emailed link (self-service + admin-initiated); backend-served reset page; SMTP/file/memory backends | done |
+| **12. Daily Trial Balance** — **partial.** Sections 1/3/6/7 modelled (SDD §9 formulas; Section 3 pulled read-only from Daily Sales Summary; finalize lock). Sections 2/4/5/8/9/10/11 stored as a `manual_json` blob pending SDD ADR-1. Formula sign of Section 6 litres + density deduction still need a workbook cross-check. | partial |
 | CI (`.github/workflows/ci.yml`), installer scaffold (`installer/`) | done — installer packaging is a scaffold; PyInstaller freeze + Tesseract bundling are follow-on |
-| **12. Daily Trial Balance** | **blocked** on SDD ADR-1 — client must decide: Sections 3/8/9 as manual columns, or computed rollups from Credit Master / Monthly Expenses / Payroll |
-| OCR pipeline (Tesseract), Excel import/export, external bank-statement reconciliation, 2FA enforcement | not started |
+| OCR pipeline (Tesseract), Excel import/export, external bank-statement reconciliation, 2FA enforcement, Employee Master insurance sections | not started |
 
 ## Layout
 

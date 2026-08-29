@@ -36,6 +36,8 @@ class PumpSide:
     salesman: str | None = None
     hs_amount: float = 0.0
     ms_amount: float = 0.0
+    hs_liters: float = 0.0
+    ms_liters: float = 0.0
     oil_amounts: list[float] = field(default_factory=lambda: [0.0] * len(OIL_KEYS))
     gas_total: float = 0.0
     oil_total: float = 0.0
@@ -67,6 +69,9 @@ def _side_from_entry(row: sqlite3.Row | None) -> PumpSide:
     side.entry_mode = row["entry_mode"]
     side.hs_amount = (result.get("hs") or {}).get("amount") or 0.0
     side.ms_amount = (result.get("ms") or {}).get("amount") or 0.0
+    ds = result.get("daily_summary") or {}
+    side.hs_liters = ds.get("hs") or 0.0
+    side.ms_liters = ds.get("ms") or 0.0
     oils = result.get("oils") or []
     side.oil_amounts = [
         (oils[i].get("amount") if i < len(oils) and oils[i].get("amount") is not None else 0.0)
@@ -109,6 +114,8 @@ def build_summary(conn: sqlite3.Connection, shift_date: str) -> dict:
     combined = {
         "hs": line(office.hs_amount, road.hs_amount),
         "ms": line(office.ms_amount, road.ms_amount),
+        "hs_liters": line(office.hs_liters, road.hs_liters),
+        "ms_liters": line(office.ms_liters, road.ms_liters),
         "oils": [
             {"key": OIL_KEYS[i], "label": OIL_LABELS[OIL_KEYS[i]],
              **line(office.oil_amounts[i], road.oil_amounts[i])}

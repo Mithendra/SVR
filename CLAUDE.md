@@ -47,9 +47,15 @@ Repo-wide guidance for AI-assisted development. The authoritative product spec i
   assumption: Backend + Scheduler are Windows Services; the Electron frontend is a
   per-user Startup-folder shortcut.
 - **Retired Administrator role** → assumed folded into Manager (§19 item 25).
-- **Trial Balance normalization / canonical source-of-truth** (ADR-1, §8.5). Must
-  be settled *before* the Trial Balance module's schema is written. Does not block
-  Daily Sales Entry.
+- **Trial Balance normalization / canonical source-of-truth** (ADR-1, §8.5). STILL
+  OPEN. The Daily Trial Balance module ships with Sections **1, 3, 6, 7** modelled
+  (SDD §9 formulas; Section 3 pulled read-only from Daily Sales Summary) and
+  Sections **2, 4, 5, 8, 9, 10, 11** stored as a free-form `manual_json` blob until
+  the client decides manual-columns vs computed-rollups. No production data yet, so
+  either path is cheap to build now. Also: the Section 6 stock-value litres sign
+  (`diff − consumption`) and the density deduction reconcile against SDD prose but
+  are **not yet cross-checked against the AUG11/AUG12 workbooks** — do that before
+  calling the formulas production-ready (`backend/src/svr_backend/calc/daily_trial_balance.py`).
 - **Rate Master effective-dating / historical rate freezing** (§19 item 7). Current
   behavior: a Daily Sales Entry locks the effective Sell Rate onto itself at create
   time — safe even if effective-dating is added later.
