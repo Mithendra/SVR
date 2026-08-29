@@ -36,6 +36,11 @@ class Settings(BaseSettings):
 
     session_ttl_minutes: int = 12 * 60
 
+    # Fernet key (urlsafe-base64, 32 bytes) for encrypting sensitive fields at rest
+    # (SDD 13.3 - employee bank account / IFSC). Set SVR_FIELD_KEY in production;
+    # an insecure dev key is used with a warning when unset.
+    field_key: str | None = None
+
     def resolved_db_path(self) -> Path:
         return self.db_path or (self.data_dir / "svr.sqlite")
 

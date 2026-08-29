@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Employee Master</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Employee Master &amp; Payroll Run</p>
+        </div>
+        <div class="header-right"><div class="doc-tag">Manager / Owner</div></div>
+      </div>
+      <div class="last-updated-bar"><span>Signed in as: <b id="who">&mdash;</b></span></div>
+
+      <div class="body-pad">
+        <p style="font-size:11px;color:var(--io-red);margin:0 0 10px">
+          Account Number, IFSC and Bank Branch are encrypted at rest (SDD 13.3). The list shows
+          them masked; open a row (Edit) to view the full values.
+        </p>
+
+        <div class="section-title">1. <span id="form-title">Add Employee</span></div>
+        <table>
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Name</td><td><input id="e-name" /></td></tr>
+          <tr><td>Designation</td><td><input id="e-designation" /></td></tr>
+          <tr><td>Daily Wage</td><td><input id="e-wage" /></td></tr>
+          <tr><td>Bank Name</td><td><input id="e-bank" /></td></tr>
+          <tr><td>Account Number <span style="color:var(--io-red)">(sensitive)</span></td><td><input id="e-account" /></td></tr>
+          <tr><td>IFSC Code <span style="color:var(--io-red)">(sensitive)</span></td><td><input id="e-ifsc" /></td></tr>
+          <tr><td>Bank Branch</td><td><input id="e-branch" /></td></tr>
+          <tr><td>Status</td><td><select id="e-status"><option>Active</option><option>Inactive</option></select></td></tr>
+        </table>
+        <div class="export-bar">
+          <button type="button" class="export-btn" id="save-btn">Save Employee</button>
+          <button type="button" class="export-btn secondary" id="cancel-btn" style="display:none">Cancel Edit</button>
+        </div>
+        <p id="form-status" class="status-line"></p>
+
+        <table style="margin-top:6px">
+          <tr><th>Name</th><th>Designation</th><th>Daily Wage</th><th>Bank</th><th>Account</th><th>IFSC</th><th>Status</th><th></th></tr>
+          <tbody id="emp-rows"></tbody>
+        </table>
+
+        <div class="section-title">2. Payroll Run <span style="font-weight:400;font-size:11px">[Bi-weekly]</span></div>
+        <table>
+          <tr><th>Period Start</th><th>Period End</th><th>Pay Date</th><th></th></tr>
+          <tr>
+            <td><input type="date" id="pr-start" /></td>
+            <td><input type="date" id="pr-end" /></td>
+            <td><input type="date" id="pr-paydate" /></td>
+            <td><button type="button" class="add-row-btn" style="margin:0" id="run-btn">Run Payroll</button></td>
+          </tr>
+        </table>
+        <table style="margin-top:6px">
+          <tr><th>Employee</th><th>Daily Wage</th><th>Days Worked</th><th>Advance Deduction</th></tr>
+          <tbody id="pr-input-rows"></tbody>
+        </table>
+        <p id="run-status" class="status-line"></p>
+
+        <div class="summary-box">
+          <h3>Last Payroll Run</h3>
+          <div id="run-lines"></div>
+          <div class="summary-row"><span>Gross Total</span><span id="r-gross">—</span></div>
+          <div class="summary-row"><span>Advance Total</span><span id="r-advance">—</span></div>
+          <div class="summary-row net"><span>Net Pay Total</span><span id="r-net">—</span></div>
+        </div>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>

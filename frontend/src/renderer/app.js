@@ -11,6 +11,7 @@ const MODULES = [
   { key: "manage-users", label: "Manage Users", href: "screens/manage-users/index.html", roles: ["Manager", "Owner"] },
   { key: "credit-remittance-master", label: "Credit / Remittance Master", href: "screens/credit-remittance-master/index.html", roles: ["Manager", "Owner"] },
   { key: "monthly-expenses", label: "Monthly Expenses", href: "screens/monthly-expenses/index.html", roles: ["Manager", "Owner"] },
+  { key: "employee-master", label: "Employee Master", href: "screens/employee-master/index.html", roles: ["Manager", "Owner"] },
   { key: "daily-trial-balance", label: "Daily Trial Balance", href: "#", roles: ["Manager", "Owner"], todo: true },
 ];
 
