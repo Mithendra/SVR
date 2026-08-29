@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVR - Yearly Sales Report</title>
+    <link rel="stylesheet" href="../../styles/app.css" />
+  </head>
+  <body>
+    <div class="sheet">
+      <div class="flamebar"></div>
+      <div class="header">
+        <div>
+          <h1>SVR Indian Oil Service Station</h1>
+          <p>Ponnur &nbsp;&bull;&nbsp; Yearly Sales Report (Financial Year)</p>
+        </div>
+        <div class="header-right"><div class="doc-tag" id="fy-tag">FY —</div></div>
+      </div>
+      <div class="last-updated-bar"><span>Signed in as: <b id="who">&mdash;</b></span></div>
+
+      <div class="body-pad">
+        <p style="font-size:12px;color:var(--io-red);font-weight:700;margin:0 0 10px" id="disclaimer">—</p>
+
+        <div class="meta-grid">
+          <div class="field"><label for="fy-year">FY start year (e.g. 2026 = Apr 2026–Mar 2027)</label><input id="fy-year" type="number" /></div>
+          <div class="field"><label>&nbsp;</label><button type="button" class="export-btn" id="gen-btn">Generate</button></div>
+        </div>
+        <p id="report-status" class="status-line"></p>
+
+        <div id="report" style="display:none">
+          <div class="section-title">Computed from records (live)</div>
+          <table>
+            <tr><th>Line</th><th>Amount</th></tr>
+            <tr><td>Diesel (HS) — Total Sales</td><td id="v-hs"></td></tr>
+            <tr><td>Petrol (MS) — Total Sales</td><td id="v-ms"></td></tr>
+            <tr class="total-row"><td>Total Fuel Sales</td><td id="v-fuel"></td></tr>
+            <tr><td>Oil / Lubricant — Total Sales</td><td id="v-oil"></td></tr>
+            <tr class="total-row"><td>Total Revenue</td><td id="v-revenue"></td></tr>
+            <tr><td>Salaries Paid (Payroll Run net)</td><td id="v-salaries"></td></tr>
+            <tr><td>Operational Expenses</td><td id="v-opex"></td></tr>
+          </table>
+
+          <div class="section-title">Manual figures <span style="font-weight:400;font-size:11px">(from Daily Trial Balance — Owner editable)</span></div>
+          <table>
+            <tr><th>Field</th><th>Value</th></tr>
+            <tr><td>COGS — Opening Stock Value (Apr 1)</td><td><input id="m-open" /></td></tr>
+            <tr><td>COGS — Purchases During Year</td><td><input id="m-purch" /></td></tr>
+            <tr><td>COGS — Closing Stock Value (Mar 31)</td><td><input id="m-close" /></td></tr>
+            <tr><td>IOCL Commission — Diesel (HS)</td><td><input id="m-hscomm" /></td></tr>
+            <tr><td>IOCL Commission — Petrol (MS)</td><td><input id="m-mscomm" /></td></tr>
+            <tr><td>Notes</td><td><input id="m-notes" /></td></tr>
+          </table>
+          <div class="export-bar">
+            <button type="button" class="export-btn" id="save-figs-btn">Save Figures</button>
+            <button type="button" class="export-btn secondary" onclick="window.print()">Print</button>
+          </div>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <div class="summary-row"><span>Cost of Goods Sold</span><span id="d-cogs">—</span></div>
+            <div class="summary-row"><span>Gross Profit (Revenue − COGS)</span><span id="d-gross">—</span></div>
+            <div class="summary-row"><span>Total IOCL Commission</span><span id="d-comm">—</span></div>
+            <div class="summary-row"><span>Total Operating Costs (Salaries + Opex)</span><span id="d-opcost">—</span></div>
+            <div class="summary-row net"><span>Net Profit</span><span id="d-net">—</span></div>
+          </div>
+
+          <div class="section-title">By Month</div>
+          <table>
+            <tr><th>Month</th><th>Fuel Sales</th><th>Oil Sales</th></tr>
+            <tbody id="month-rows"></tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:18px"><a href="../../index.html">&larr; Back to menu</a></p>
+      </div>
+    </div>
+    <script type="module" src="./screen.js"></script>
+  </body>
+</html>
