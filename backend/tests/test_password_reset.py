@@ -3,8 +3,7 @@ single-use + expiry, no account enumeration, no plaintext anywhere (SDD 13.1).""
 
 from __future__ import annotations
 
-from tests.conftest import DEMO_PASSWORD
-
+from conftest import DEMO_PASSWORD
 from svr_backend.core.email import OUTBOX
 
 NEW_PW = "brand-new-passw0rd"

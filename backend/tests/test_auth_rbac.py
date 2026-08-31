@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from tests.conftest import DEMO_PASSWORD
+from conftest import DEMO_PASSWORD
 
 
 def test_login_success_returns_token_and_role(client):
