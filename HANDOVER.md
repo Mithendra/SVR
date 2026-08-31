@@ -35,17 +35,31 @@ Read this first, then [`CLAUDE.md`](CLAUDE.md) and
 
 ## 2. This testing PC — what it needs
 
-You do **not** need Python, Node, or VS Code **to test the installer**. You need:
+Its job is to mirror the real station PC, so keep it **clean of build tools**.
+
+**Install:**
 
 1. **Administrator rights** on the box (the installer registers Windows Services).
-2. **The repo** on disk, so this session can read the scripts and logs:
-   - `git clone <repo-url>` if git is available, **or** copy the project folder
-     over from the build PC / a USB drive. Any branch that contains this file is
-     fine (it was pushed to `main`).
-3. **Claude Code itself.** If VS Code isn't installed, use the **native install**
-   (no Node required) — see `https://claude.ai/download` or the native install
-   script — or install VS Code + the Claude Code extension. Either works.
+2. **Claude Code — native install** (`https://claude.ai/download`). Runs without
+   Node or VS Code; this is how the next session runs here.
+3. **Git** — to `git clone https://github.com/Mithendra/SVR.git` so the session
+   can read this file + the scripts + logs. (Or just copy the project folder over
+   and skip Git.) Everything is on **`main`** — there is no PR to merge, just clone.
 4. **The installer `.exe`** — see §3. It is **not** in the repo.
+
+**Do NOT install:** Visual Studio, **VS Code**, **Python**, **Node**. None are
+needed to run the installer, and any of them present makes this a less honest
+"clean target" test. (No C/C++ toolchain is needed anywhere in this project.)
+
+**OS:** target is Windows 11 (matches the build PC). If you ever test on Windows
+10, use 64-bit 21H2/22H2 — see §6 item 5 for the one failure mode to watch.
+
+### Two-machine model
+
+| Machine | Role |
+|---|---|
+| **This testing PC** | Runs the acceptance test (§5). No Python/Node/VS. |
+| **Build PC** (has Python 3.11+ & Node 20+) | Rebuilds only. If §5 finds a bug in `first-run.ps1` / the spec / `main.js`, fix + re-freeze + new `.exe` happens there (`installer\build-all.ps1`), then copy the new `.exe` back here and re-test. Still no Visual Studio. |
 
 > The "symlink privilege / Developer Mode" issue from the build PC is a
 > **build-time** electron-builder quirk only. It has **nothing to do with
@@ -181,6 +195,12 @@ the build box). If the acceptance test fails, it is most likely one of these:
    with an insecure dev key and logs a warning.
 4. **First-run exit codes.** `first-run.ps1` exits `3` if a service failed to
    install/start; `installer.nsh` surfaces that in a message box.
+5. **Frozen binary vs. OS runtime.** The `.exe` is built on Windows 11 x64. On
+   Windows 11 this is a non-issue. If it ever fails on Windows 10 with
+   `DLL load failed` / a missing `api-ms-win-*` or `VCRUNTIME140*.dll`, install
+   the **VC++ 2015–2022 x64 redistributable** on the target, or re-freeze on
+   Windows 10. `tzdata` (for `Asia/Kolkata`) *is* bundled — verified — so the
+   scheduler's timezone is not a concern.
 
 ### If something fails — where to look
 
