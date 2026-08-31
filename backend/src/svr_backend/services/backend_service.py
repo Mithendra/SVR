@@ -45,10 +45,11 @@ class SvrBackendService(win32serviceutil.ServiceFramework):
             host=settings.api_host,
             port=settings.api_port,
             log_level="info",
-            # log_config=None: keep the RotatingFileHandler that
-            # logging_setup.configure("backend") installs on the root logger.
-            # uvicorn's default dictConfig would otherwise reset logging and the
-            # service would write nothing to backend-service.log.
+            # log_config=None: a Windows Service has no console, so uvicorn's
+            # default logging dictConfig (StreamHandlers on sys.stdout/stderr,
+            # which are absent) fails on config.load(). None skips it and lets
+            # uvicorn's records propagate to the RotatingFileHandler that
+            # logging_setup.configure("backend") put on the root logger.
             log_config=None,
         )
         self._server = _Server(config)
