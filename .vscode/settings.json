@@ -1,0 +1,45 @@
+{
+  // This project's Python tooling lives in backend/.venv (ruff, pytest, uvicorn...).
+  // Pinning the interpreter here makes every VS Code Python extension - including
+  // the Microsoft linter/formatter servers - launch against an env that exists
+  // and has the packages, instead of a bare global python.
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
+  "python.terminal.activateEnvironment": true,
+
+  // Formatting/linting is ruff, not autopep8/black/flake8/pylint.
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  "ruff.importStrategy": "fromEnvironment",
+
+  // Belt-and-braces: if the autopep8 extension is left enabled, at least point its
+  // server at a real interpreter so it stops failing with spawn ENOENT. Better:
+  // disable the "autopep8" extension for this workspace (Extensions view - it is
+  // redundant with ruff).
+  "autopep8.interpreter": ["${workspaceFolder}/backend/.venv/Scripts/python.exe"],
+  "black-formatter.interpreter": ["${workspaceFolder}/backend/.venv/Scripts/python.exe"],
+  "flake8.interpreter": ["${workspaceFolder}/backend/.venv/Scripts/python.exe"],
+  "pylint.interpreter": ["${workspaceFolder}/backend/.venv/Scripts/python.exe"],
+
+  // pytest, run from backend/ (matches CI and pyproject testpaths).
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.cwd": "${workspaceFolder}/backend",
+  "python.testing.pytestArgs": ["-q"],
+
+  // Keep build output out of search / file-watching.
+  "files.watcherExclude": {
+    "**/backend/packaging/build/**": true,
+    "**/backend/packaging/dist/**": true,
+    "**/installer/output/**": true,
+    "**/node_modules/**": true
+  },
+  "search.exclude": {
+    "**/backend/packaging/dist": true,
+    "**/installer/output": true
+  }
+}
