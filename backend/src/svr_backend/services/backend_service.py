@@ -45,6 +45,11 @@ class SvrBackendService(win32serviceutil.ServiceFramework):
             host=settings.api_host,
             port=settings.api_port,
             log_level="info",
+            # log_config=None: keep the RotatingFileHandler that
+            # logging_setup.configure("backend") installs on the root logger.
+            # uvicorn's default dictConfig would otherwise reset logging and the
+            # service would write nothing to backend-service.log.
+            log_config=None,
         )
         self._server = _Server(config)
         self._thread = threading.Thread(target=self._server.run, daemon=True)
