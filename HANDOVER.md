@@ -179,7 +179,15 @@ Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\SVR IOCL S
 ## 6. Assumptions that are UNVERIFIED — watch these closely
 
 The packaging session could not test any of this (no admin service lifecycle on
-the build box). If the acceptance test fails, it is most likely one of these:
+the build box). If the acceptance test fails, it is most likely one of these.
+
+> **Shortcut for items 1–4:** `installer\smoke-services.ps1` (run from an
+> **elevated** PowerShell) does an isolated register → start → `/health` → stop →
+> remove of both frozen services against a TEMP data dir, restoring everything
+> afterwards. It touches neither `C:\ProgramData\SVR-IOCL` nor any real install,
+> so it is safe to run **on the build PC** for the earliest possible signal —
+> before the full §5 test on a clean box. Green here = the service machinery is
+> sound and a §5 failure is elsewhere (installer, env, SmartScreen).
 
 1. **Frozen service registration.** Does `svr-backend-service.exe --startup auto
    install` write the exe's own path as the service `ImagePath` (pywin32's
@@ -279,6 +287,8 @@ installer/
   first-run.ps1          migrations, Machine SVR_* config, one-time Fernet key,
                          register+start both services, per-user Startup shortcut
   uninstall.ps1          stop+delete services, remove shortcut, KEEP data tree
+  smoke-services.ps1     ELEVATED, self-cleaning: isolated register/start/health/
+                         stop/remove of the frozen services (see §6 shortcut box)
   build-all.ps1          one-shot: freeze backend → npm run dist
   README.md              current packaging reference
 ```

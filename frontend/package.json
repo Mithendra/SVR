@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "SVR Indian Oil Service Station - ElectronJS desktop frontend",
+  "author": "SVR Indian Oil Service Station",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
