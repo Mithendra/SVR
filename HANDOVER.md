@@ -17,8 +17,9 @@ Read this first, then [`CLAUDE.md`](CLAUDE.md) and
 - **Packaging is code-complete and builds cleanly** on a dev machine: a single
   NSIS installer (`SVR-IOCL-Station-Setup-<version>.exe`) that bundles a
   PyInstaller-frozen backend, so the target PC needs **no Python and no Node**.
-- **Packaging has NOT been validated on a clean machine.** That is the job for
-  this testing PC. Everything below in §5–§6 is unverified until you run it.
+- **Packaging IS validated on the testing PC** (updated 2026-09-04 — see §5.8
+  below for the results). Reboot survives, services auto-start, the app
+  auto-launches, forms load and save. Only §5.7 (uninstall) is still open.
 
 ### What the packaging session delivered (commit history around 2026-08-29)
 
@@ -174,6 +175,24 @@ Test-Path C:\ProgramData\SVR-IOCL    # STILL True — data is deliberately kept
 Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\SVR IOCL Station.lnk"  # False
 ```
 
+### 5.8 Results (testing PC, 2026-09-04)
+
+| Step | Result |
+|---|---|
+| 5.1 Install | ✅ Done (installed ~2026-08-31; unsigned SmartScreen click-through as expected) |
+| 5.2 Services | ✅ `SVR-IOCL-Backend` + `SVR-IOCL-Scheduler` both `Running` |
+| 5.3 Data tree / logs | ✅ `backend-service.log` has continuous real `uvicorn.access` entries spanning 2026-08-31 → 2026-09-04 (`/health`, `/auth/login`, `/auth/me`, `/daily-sales-entry/*`, `/daily-trial-balance/*`, all `200`) — confirms migrations ran, DB healthy, `SVR_LOG_DIR` machine env var reached the service |
+| 5.4 `/health` | ✅ (implied by the log entries above) |
+| 5.5 App + login | ✅ Logged in as `mmanager`; Daily Sales Entry + Daily Trial Balance forms load and save |
+| 5.6 Reboot | ✅ **Confirmed 2026-09-04** — after restarting the testing PC, both services were up on their own and the app auto-launched from the Startup shortcut and reached the backend, no manual intervention |
+| 5.7 Uninstall | ⬜ **Not yet run** — the only remaining open item. Do this last, once done exploring the live install (it removes the services). |
+
+**Net effect:** the biggest unverified risk from §6 (frozen service registration +
+SCM start + Machine env-var inheritance) is now confirmed working end-to-end,
+across a reboot. The earlier `log_config=None` fix (commits `abe737f`/`eac2a38`)
+turned out not to be needed to reproduce this — logging worked without it on this
+install — but it stays in the codebase as cheap defensive hygiene.
+
 ---
 
 ## 6. Assumptions that are UNVERIFIED — watch these closely
@@ -230,9 +249,9 @@ the build box). If the acceptance test fails, it is most likely one of these.
 ### Must do to be "deployable"
 | Item | Note |
 |---|---|
-| **This acceptance test (§5)** | The gate. Record pass/fail per step. |
-| **Fix whatever §6 surfaces** | Service ImagePath / env inheritance are the likely culprits. |
-| **CI `build` job green** | Confirm the added PyInstaller freeze step passes on `windows-latest`. |
+| **Acceptance test (§5)** | ✅ 5.1–5.6 confirmed on the testing PC (see §5.8), including a reboot. Only **5.7 uninstall** is still open. |
+| **Fix whatever §6 surfaces** | ✅ Nothing bad surfaced — service registration, SCM start, and Machine env-var inheritance all confirmed working. |
+| **CI `build` job green** | ✅ Confirmed — every push from `0c61e9f` onward (through `ac020fa`) built successfully, artifact `svr-iocl-station-installer` present. |
 
 ### Should do for a real release
 | Item | Note |
