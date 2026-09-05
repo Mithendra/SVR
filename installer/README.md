@@ -55,6 +55,32 @@ The installer filename tracks `frontend/package.json`'s version
 `backend/__init__.py`'s `__version__`, so keeping the three in step is what makes
 the running backend, the API, and the installer all report the same number.
 
+## Code-signing (cert-ready, currently unsigned)
+
+The build is **wired for Authenticode signing but ships unsigned** — no config
+change is needed either way, electron-builder decides from the environment:
+
+- **No cert** (today): `build-all.ps1` / `npm run dist` produce an **unsigned**
+  installer. On a fresh PC, SmartScreen shows "Unknown publisher" and the user
+  clicks *More info → Run anyway* once. The app still installs and runs normally.
+- **With a cert**: set two environment variables before the build and
+  electron-builder signs the app exe + the installer automatically:
+
+  ```powershell
+  $env:CSC_LINK          = "C:\path\to\svr-codesign.pfx"   # the certificate file
+  $env:CSC_KEY_PASSWORD  = "<pfx password>"
+  installer\build-all.ps1
+  ```
+
+  Nothing else changes. `signtool` and a timestamp server are handled by
+  electron-builder (the signature stays valid after the cert expires).
+
+Getting a cert: an **OV code-signing certificate** from a CA (DigiCert, Sectigo,
+GlobalSign, …) after they verify the dealership's business registration — roughly
+a yearly subscription. For a single on-prem station with a handful of known
+users, staying unsigned is a reasonable choice; sign if the app is ever
+distributed more widely or IOCL requires it. Never commit the `.pfx` to the repo.
+
 ## What the installer does on the target
 
 `perMachine` + assisted (not one-click), so it runs elevated. On install,
