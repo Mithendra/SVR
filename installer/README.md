@@ -30,6 +30,31 @@ That runs two steps:
 CI's `build` job (`.github/workflows/ci.yml`) runs the same two steps and uploads
 the `.exe` artifact.
 
+## Releasing a new version
+
+The version number is kept by hand in three places — bump all three together:
+
+| File | Field |
+|---|---|
+| `frontend/package.json` | `"version"` |
+| `backend/pyproject.toml` | `[project] version` |
+| `backend/src/svr_backend/__init__.py` | `__version__` |
+
+Then:
+
+```powershell
+cd backend; .venv\Scripts\python -m ruff check .; .venv\Scripts\python -m pytest -q; cd ..
+cd frontend; npm run lint; npx playwright test; cd ..
+installer\build-all.ps1
+git add -A && git commit -m "release: vX.Y.Z"
+git tag vX.Y.Z && git push --tags
+```
+
+The installer filename tracks `frontend/package.json`'s version
+(`SVR-IOCL-Station-Setup-<version>.exe`). `/health` returns
+`backend/__init__.py`'s `__version__`, so keeping the three in step is what makes
+the running backend, the API, and the installer all report the same number.
+
 ## What the installer does on the target
 
 `perMachine` + assisted (not one-click), so it runs elevated. On install,
