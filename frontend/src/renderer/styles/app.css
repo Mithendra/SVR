@@ -277,6 +277,26 @@ body {
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
+/* IOCL mark in every form header (BRD branded mockups). Adjust --header-logo-size
+   here for all forms at once, or set it inline on one .header-logo for a single form. */
+.header-logo {
+  --header-logo-size: 44px;
+  width: var(--header-logo-size);
+  height: var(--header-logo-size);
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-sizing: border-box;
+}
+.header-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 .header-right {
   display: flex;
   align-items: center;
