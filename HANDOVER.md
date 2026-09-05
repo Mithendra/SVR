@@ -19,7 +19,10 @@ Read this first, then [`CLAUDE.md`](CLAUDE.md) and
   PyInstaller-frozen backend, so the target PC needs **no Python and no Node**.
 - **Packaging IS validated on the testing PC** (updated 2026-09-04 — see §5.8
   below for the results). Reboot survives, services auto-start, the app
-  auto-launches, forms load and save. Only §5.7 (uninstall) is still open.
+  auto-launches, forms load and save. §5.7 (uninstall) is deliberately
+  **deferred, not skipped** — the testing PC stays installed for continued
+  use; uninstall gets verified when that machine is actually decommissioned
+  or at real deployment time.
 
 ### What the packaging session delivered (commit history around 2026-08-29)
 
@@ -185,7 +188,7 @@ Test-Path "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\SVR IOCL S
 | 5.4 `/health` | ✅ (implied by the log entries above) |
 | 5.5 App + login | ✅ Logged in as `mmanager`; Daily Sales Entry + Daily Trial Balance forms load and save |
 | 5.6 Reboot | ✅ **Confirmed 2026-09-04** — after restarting the testing PC, both services were up on their own and the app auto-launched from the Startup shortcut and reached the backend, no manual intervention |
-| 5.7 Uninstall | ⬜ **Not yet run** — the only remaining open item. Do this last, once done exploring the live install (it removes the services). |
+| 5.7 Uninstall | ⏸ **Deferred on purpose (2026-09-04)** — the testing PC stays installed for continued use rather than being torn down now. Uninstall gets verified at actual deployment/decommission time, not before. |
 
 **Net effect:** the biggest unverified risk from §6 (frozen service registration +
 SCM start + Machine env-var inheritance) is now confirmed working end-to-end,
@@ -249,7 +252,7 @@ the build box). If the acceptance test fails, it is most likely one of these.
 ### Must do to be "deployable"
 | Item | Note |
 |---|---|
-| **Acceptance test (§5)** | ✅ 5.1–5.6 confirmed on the testing PC (see §5.8), including a reboot. Only **5.7 uninstall** is still open. |
+| **Acceptance test (§5)** | ✅ 5.1–5.6 confirmed on the testing PC (see §5.8), including a reboot. **5.7 uninstall deliberately deferred** to actual deployment/decommission time — not a blocker. |
 | **Fix whatever §6 surfaces** | ✅ Nothing bad surfaced — service registration, SCM start, and Machine env-var inheritance all confirmed working. |
 | **CI `build` job green** | ✅ Confirmed — every push from `0c61e9f` onward (through `ac020fa`) built successfully, artifact `svr-iocl-station-installer` present. |
 
