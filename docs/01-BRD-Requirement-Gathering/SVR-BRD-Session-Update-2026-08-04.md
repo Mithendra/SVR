@@ -1357,4 +1357,45 @@ New requirement: a daily backup of the whole application — not just the databa
 
 **Files updated:** none yet — requirement + recommended approach only. Implementation touches `backend/src/svr_backend/scheduler.py` (cold backup/restore routine + on-demand polling), a new `backend/src/svr_backend/api/backup.py` router, a new renderer Backup panel, and a new standalone restore script bundled onto the USB backup target.
 
+> **Update (2026-09-05):** deferred. Backup/restore is set aside as its own
+> module for a future upgrade phase — not part of current scope.
+
+---
+
+## 108. App Shell Redesign — Implemented in the Renderer (2026-09-05)
+
+Entry 106's mockup decisions are now in the actual Electron code
+(`frontend/src/renderer/`), each step verified with `eslint` + the full
+Playwright suite (32 tests).
+
+- **Post-login launcher: plain button list → left sidebar + top bar.**
+  Confirmed nav order, with Manage Users in its own "Admin" group below a
+  divider. RBAC unchanged — Manager still sees Manage Users; the mockup's
+  "(Owner)" tag was dropped as it misrepresented actual access. The module
+  list, icons, and sidebar builder are factored into `lib/nav.js`.
+- **Persistent sidebar on every screen.** A shared `lib/screen-shell.js`
+  injects the identical fixed sidebar on each of the 11 screen pages on
+  load — derives the active module from the URL, checks the session token,
+  redirects to login if it is gone. The existing per-page navigation model
+  was kept; no single-page-app refactor.
+- **Login screen:** field label "Login name" → "Login".
+- **Combined SVR / IndianOil lockup.** The client supplied a
+  high-resolution lockup ("IndianOil | SVR — INDIAN OIL SERVICE STATION").
+  It replaces the earlier low-resolution mark at
+  `assets/iocl-logo.png` and now appears on the login screen, the sidebar,
+  and every form header. The redundant per-screen
+  `<h1>SVR Indian Oil Service Station</h1>` line was removed since the
+  lockup carries the station name; each page's own subtitle line stays.
+  Header logo size is one adjustable value (`--header-logo-height`) in
+  `app.css`.
+- **Deliberately not included:** the mockup's Preferences/Print icons in
+  the top bar (no feature behind them yet). A print-quality logo original
+  is still worth obtaining from IOCL for the desktop app icon specifically.
+
+Commits: `886f7a3`, `17c8dc1`, `d610c5e`, `65585db`.
+
+**Files updated:** `frontend/src/renderer/index.html`, `app.js`,
+`lib/nav.js` (new), `lib/screen-shell.js` (new), `styles/app.css`, all 11
+`screens/*/index.html`, and `frontend/src/renderer/assets/iocl-logo.png`.
+
 ---
