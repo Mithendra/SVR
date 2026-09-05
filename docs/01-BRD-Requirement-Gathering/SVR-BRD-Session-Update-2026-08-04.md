@@ -1340,3 +1340,19 @@ Client asked for a look-and-feel pass on the app shell (the screen shown right a
 **Files updated:** none yet — reviewed as a design mockup only. Once approved, applies to `frontend/src/renderer/index.html`, `app.js`, `app.css`, and `frontend/build/icon.ico`.
 
 ---
+
+## 107. Daily Full-System Backup to External USB — New Requirement (2026-09-04)
+
+New requirement: a daily backup of the whole application — not just the database — to an external USB drive, so the station can recover from a full disk/PC failure, not only data loss. Requested three things: an automatic daily run, a way to trigger it on demand, and visibility into when it last ran. Asked which approach is simplest to maintain; recommended and confirmed:
+
+- **Automatic run: extend the existing Scheduler Service, not a separate Windows Task Scheduler job.** `scheduler.py` already runs a nightly APScheduler job (00:15 IST, DB-only, SDD 7.7/8.4) inside the `SVR-IOCL-Scheduler` Windows Service. Extending that job is one moving part reusing infrastructure already built (same service, same `scheduler.log`, same missed-run catch-up pattern already used for carry-forward) versus standing up and separately monitoring a second, OS-level scheduled task. Chosen as the simpler option for a single-PC deployment with no dedicated IT support.
+- **Scope: one dated `.zip` per day** containing both the data directory (`C:\ProgramData\SVR-IOCL\` — DB, logs, existing local backups) and the installed program folder (`C:\Program Files\SVR IOCL Station\` — the frozen Python backend, Electron app, and Tesseract once bundled per ADR-6) — a single archive is enough on its own to rebuild the station on a replacement PC, not just restore data onto an already-working install.
+- **USB drive found by volume label** (e.g. the stick must be labeled `SVR-BACKUP`), not by drive letter — letters are reassigned depending on what else is plugged in; the label is stable. If the labeled drive isn't present when the job runs, skip and log it rather than fail silently or write to the wrong disk.
+- **Retention: max 7 archives.** Oldest deleted once an 8th successful backup lands on the USB drive.
+- **Manual trigger + status, in-app:** a new Owner-only "Backup" panel — last backup time and result, and a "Backup Now" button — calling two new backend endpoints (`GET /backup/status`, `POST /backup/run`), the same pattern as every other screen (server-side RBAC per SDD 4.1-4.3).
+
+**Open item:** the *existing* local DB-only backup (`C:\ProgramData\SVR-IOCL\backups\svr-*.sqlite`) has no retention limit today — grows unbounded. Decide whether it should also cap at a fixed count for consistency with the new USB job, or stay unbounded since it's small (SQLite file only).
+
+**Files updated:** none yet — requirement + recommended approach only. Implementation touches `backend/src/svr_backend/scheduler.py` (or a new `backup.py`), a new `backend/src/svr_backend/api/backup.py` router, and a new renderer screen/panel.
+
+---
