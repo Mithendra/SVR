@@ -1322,3 +1322,21 @@ Updated the note on the field itself to state this explicitly, rather than leavi
 **Files updated:** `yearly_sales_report_branded.html`, BRD Section 5.28 (final resolution added).
 
 ---
+
+## 106. App Shell Redesign — Left Sidebar, Real IOCL Logo, Preferences Bar (2026-09-04)
+
+Client asked for a look-and-feel pass on the app shell (the screen shown right after login), reviewed as a mockup before touching product code. Several rounds of client feedback, each applied directly:
+
+- **Post-login screen replaced with a left-hand sidebar**, modeled on a reference SaaS layout the client supplied, opening on Daily Sales Entry by default. Confirmed nav order: Daily Sales Entry, Daily Sales Summary, Daily Trial Balance, Credit / Remittance Master, Payment Receipt, Inventory Tracking, Rate Master, Monthly Expenses, Employee Master, Yearly Sales Report — then Manage Users, grouped under an "Admin" divider with an Owner tag since the client's list omitted it. **Open:** Manage Users' placement flagged for the client to explicitly confirm, not yet signed off.
+- **Sidebar color corrected twice.** First draft used new warm cream/tan colors; client instructed existing colors only, and separately that the sidebar chrome should avoid IOCL red/blue. Settled on the existing confirmed default accent (`--io-orange` #f37022) for the active nav item, and existing tokens (`#eef1fa`, `#c9d6ef`, `#00246e`, `#55627d`) for the rest of the sidebar — no new colors introduced anywhere in the shell.
+- **New shell-level top bar** added above each form's own header: signed-in user's name/role, a Preferences icon, a Print icon, and Sign out.
+- **Daily Sales Entry's own existing look stays untouched** — client explicitly reverted an interim redesign that had restyled the form body (blue masthead, flamebar, orange section bars, table) into softer cards to match the sidebar reference; confirmed only the shell (sidebar + new top bar) changes, not the forms themselves. Client also caught that the Save button was missing from an early toolbar draft — corrected; this app has no auto-save, Save stays an explicit action.
+- **Logo lockup uses the real IndianOil dealer logo, not a drawn substitute.** First pass used a hand-drawn abstract flame glyph; client asked for the actual IOCL corporate mark instead, since SVR is an authorized IOCL outlet — swapped in the client's own logo file. Now appears in the login screen, the sidebar, and inside the Daily Sales Entry header itself (small white badge next to the existing title) — the pattern to carry to the other 11 forms' headers.
+- **Login screen**: field label changed from "Login name" to "Login"; logo lockup added above the card.
+- **Layout**: removed the gap between the sidebar and the form content area so they sit flush, per client correction.
+
+**Open items:** the supplied logo file is low-resolution (65×70px) — request a higher-resolution original from IOCL / the signage vendor before it's wired into a real desktop app icon; rolling the header logo badge + preferences pattern out to the remaining 11 screens; `frontend/build/icon.ico` still not wired into packaging (falls back to Electron's default icon — see `HANDOVER.md` §7).
+
+**Files updated:** none yet — reviewed as a design mockup only. Once approved, applies to `frontend/src/renderer/index.html`, `app.js`, `app.css`, and `frontend/build/icon.ico`.
+
+---
