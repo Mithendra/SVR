@@ -18,11 +18,7 @@ function buildSidebar(role) {
   aside.className = "sidebar shell-sidebar";
   aside.innerHTML = `
     <div class="sidebar-brand">
-      <img src="../../assets/iocl-logo.png" alt="IndianOil" class="brand-mark" />
-      <div class="sidebar-brand-text">
-        <span class="brand-wordmark">SVR</span>
-        <span class="brand-caption">Indian Oil Station</span>
-      </div>
+      <img src="../../assets/iocl-logo.png" alt="SVR Indian Oil Service Station" class="sidebar-brand-img" />
     </div>
     <nav id="nav-links" aria-label="Modules"></nav>
     <button type="button" class="shell-signout">Sign out</button>

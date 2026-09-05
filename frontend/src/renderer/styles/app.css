@@ -38,39 +38,13 @@ body {
   box-sizing: border-box;
 }
 .brand-lockup {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
   margin-bottom: 24px;
 }
-.brand-lockup-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.brand-lockup-divider {
-  width: 1px;
-  height: 34px;
-  background: var(--line);
-}
-.brand-mark {
-  width: 34px;
-  height: 37px;
+.brand-lockup-img {
   display: block;
-}
-.brand-wordmark {
-  font-size: 26px;
-  font-weight: 800;
-  color: var(--io-blue-dark);
-  letter-spacing: 0.5px;
-}
-.brand-caption {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-  color: #55627d;
+  width: 340px;
+  max-width: 82vw;
+  height: auto;
 }
 .login-card {
   max-width: 360px;
@@ -146,26 +120,12 @@ body {
   overflow-y: auto;
 }
 .sidebar-brand {
-  padding: 4px 18px 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  padding: 6px 16px 14px;
 }
-.sidebar-brand .brand-mark {
-  width: 20px;
-  height: 22px;
-  flex-shrink: 0;
-}
-.sidebar-brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-}
-.sidebar-brand-text .brand-wordmark {
-  font-size: 16px;
-}
-.sidebar-brand-text .brand-caption {
-  font-size: 8.5px;
+.sidebar-brand-img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 #nav-links {
   display: flex;
@@ -305,25 +265,21 @@ body.shell-mode {
   letter-spacing: 0.4px;
   text-transform: uppercase;
 }
-/* IOCL mark in every form header (BRD branded mockups). Adjust --header-logo-size
-   here for all forms at once, or set it inline on one .header-logo for a single form. */
+/* SVR / Indian Oil lockup in every form header (BRD branded mockups). Adjust
+   --header-logo-height for all forms at once, or inline on one .header-logo. */
 .header-logo {
-  --header-logo-size: 44px;
-  width: var(--header-logo-size);
-  height: var(--header-logo-size);
+  --header-logo-height: 40px;
   flex-shrink: 0;
-  border-radius: 8px;
-  background: #fff;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 4px;
-  box-sizing: border-box;
+  background: #fff;
+  border-radius: 6px;
+  padding: 4px 8px;
 }
 .header-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  height: var(--header-logo-height);
+  width: auto;
+  display: block;
 }
 .header-right {
   display: flex;
